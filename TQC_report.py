@@ -388,3 +388,37 @@ df['DFECCT_REASSIGNED10_DURATION'] = defect_reassigned_list10
 
 #  3. Save to file
 df.to_csv("TQC_query_results_"+str(datetime.now().strftime("%Y-%m-%d %H%M%S"))+".csv",index=False,header=True,encoding='utf-8-sig')
+
+
+
+
+
+def calculate_sla(project_group,severity_name,priority_name,defect_status,defect_fixed_new_duration):
+    sla_status = ''
+    critical_point = 4      # default value of critical point
+    high_point = 8          # default value of high point
+    medium_point = 16       # default value of medium point
+
+    # specific value for CPC project group
+    if (project_group == 'CPC'):   
+        critical_point = 24
+        high_point = 48
+        medium_point = 120
+
+    if (severity_name == None):
+        severity_name = priority_name
+
+    if (severity_name == 'Low' or severity_name == None ):
+        sla_status = 'Low'
+    elif (defect_status == 'Cancelled'):
+        sla_status = 'Cancelled'
+    elif (severity_name == 'Critical' and defect_fixed_new_duration > critical_point):
+        sla_status = 'N'
+    elif (severity_name == 'High' and defect_fixed_new_duration > high_point):
+        sla_status = 'N'
+    elif (severity_name == 'Medium' and defect_fixed_new_duration > medium_point):
+        sla_status = 'N'
+    else:
+        #print("severity: {}".format(severity_name)) 
+        sla_status = 'Y'
+    return sla_status
