@@ -315,6 +315,8 @@ for index, row in df.iterrows():
             defect_fixed_assigned_duration = 0
     defect_fixed_assigned_list.append(defect_fixed_assigned_duration)
 
+    sla_status = calculate_sla()
+
     # calculate SLA
     sla_status = ''
     if (current_severity_name == None):
@@ -394,6 +396,27 @@ df.to_csv("TQC_query_results_"+str(datetime.now().strftime("%Y-%m-%d %H%M%S"))+"
 
 
 def calculate_sla(project_group,severity_name,priority_name,defect_status,defect_fixed_new_duration):
+    """calculate the SLA and check whether it meet SLA criteria or not
+
+    Parameters
+    ----------
+    project_group : str
+        The specific project group (default is blank).
+    severity_name : str
+        The severity name (Critical,High,Medium).
+    priority_name : str
+        The priority name will be used if the severity name is none.
+    defect_status : str
+        The defect status (Open,Fixed,Closed,Cancelled)
+    defect_fixed_new_duration : int
+        The defect duration from new status to fixed status
+
+    Returns
+    -------
+    str
+        Status: Y or N
+
+    """
     sla_status = ''
     critical_point = 4      # default value of critical point
     high_point = 8          # default value of high point
