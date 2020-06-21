@@ -205,6 +205,7 @@ for index, row in df.iterrows():
     current_main_defect_status = row['MAIN_DEFECT_STATUS']
     current_severity_name = row['SEVERITY_NAME']
     current_priority_name = row['PRIORITY_NAME']
+    current_project_name = row['PROJECT_NAME']
     # current_defect_id = 2778
     # current_sub_defect_no = 1
     # print(current_defect_id) 
@@ -244,9 +245,16 @@ for index, row in df.iterrows():
         closed_date = datetime.now()
 
     # calculate new duration
+
+
+
     defect_new_duration = 0
     if new_date != '' and assigned_date != '':
-        defect_new_duration = businessDuration(startdate=new_date,enddate=assigned_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
+        if current_project_name.startswith('CPC'):
+            defect_new_duration = businessDuration(startdate=new_date,enddate=assigned_date,weekendlist=[],unit=unit_hour)
+        else:
+            defect_new_duration = businessDuration(startdate=new_date,enddate=assigned_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
+        
         #print("defect_new_duration: {}".format(defect_new_duration))
         if math.isnan(defect_new_duration):
             defect_new_duration = 0
@@ -261,7 +269,10 @@ for index, row in df.iterrows():
     if ready_to_test_date == '':
         ready_to_test_date = datetime.now()
     if new_date != '' and ready_to_test_date != '':
-        defect_fixed_new_duration = businessDuration(startdate=new_date,enddate=ready_to_test_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
+        if current_project_name.startswith('CPC'):
+            defect_fixed_new_duration = businessDuration(startdate=new_date,enddate=ready_to_test_date,weekendlist=[],unit=unit_hour)
+        else:
+            defect_fixed_new_duration = businessDuration(startdate=new_date,enddate=ready_to_test_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
         if math.isnan(defect_fixed_new_duration):
             defect_fixed_new_duration = 0
 
@@ -271,7 +282,11 @@ for index, row in df.iterrows():
     defect_test_duration = 0
 
     if ready_to_test_date != '' and closed_date != '':
-        defect_test_duration = businessDuration(startdate=ready_to_test_date,enddate    =closed_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
+        
+        if current_project_name.startswith('CPC'):
+            defect_test_duration = businessDuration(startdate=ready_to_test_date,enddate=closed_date,weekendlist=[],unit=unit_hour)
+        else:
+            defect_test_duration = businessDuration(startdate=ready_to_test_date,enddate=closed_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
         
         if math.isnan(defect_test_duration):
             defect_test_duration = 0
@@ -280,7 +295,10 @@ for index, row in df.iterrows():
     # calculate age days ( detected_date -> closed_date)
     defect_age_duration = 0
     if new_date != '' and closed_date != '':
-        defect_age_duration =  businessDuration(startdate=new_date,enddate=closed_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
+        if current_project_name.startswith('CPC'):
+            defect_age_duration =  businessDuration(startdate=new_date,enddate=closed_date,weekendlist=[],unit=unit_hour)
+        else:
+            defect_age_duration =  businessDuration(startdate=new_date,enddate=closed_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
         if math.isnan(defect_age_duration):
             defect_age_duration = 0
     defect_age_list.append(defect_age_duration)
@@ -288,7 +306,11 @@ for index, row in df.iterrows():
     # ( assigned_date -> ready_to_test_date ) 
     defect_fixed_assigned_duration = 0
     if assigned_date != '' and ready_to_test_date != '':
-        defect_fixed_assigned_duration = businessDuration(startdate=assigned_date,enddate=ready_to_test_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
+        if current_project_name.startswith('CPC'):
+            defect_fixed_assigned_duration = businessDuration(startdate=assigned_date,enddate=ready_to_test_date,weekendlist=[],unit=unit_hour)
+        else:
+            defect_fixed_assigned_duration = businessDuration(startdate=assigned_date,enddate=ready_to_test_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
+        
         if math.isnan(defect_fixed_assigned_duration):
             defect_fixed_assigned_duration = 0
     defect_fixed_assigned_list.append(defect_fixed_assigned_duration)
@@ -298,6 +320,7 @@ for index, row in df.iterrows():
     if (current_severity_name == None):
         current_severity_name = current_priority_name
 
+    # Default SLA
     if (current_severity_name == 'Low' or current_severity_name == None ):
         sla_status = 'Low'
     elif (current_main_defect_status == 'Cancelled'):
