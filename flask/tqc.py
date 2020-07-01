@@ -98,7 +98,6 @@ where  row_num=1 and rownum <= 30
 SQL_Query = pd.read_sql_query(sql,connect)
 df = pd.DataFrame(SQL_Query)
 
-
 @app.route("/")
 def mainTable():
     cur = connect.cursor()
@@ -111,7 +110,8 @@ def mainTable():
     defect_fixed_assigned_list = DurSLA[2]
     defect_test_list = DurSLA[3]
     defect_age_list = DurSLA[4]
-    return render_template('tqcPage.html', datas=rows, new_durations=defect_new_list,fixed_new=defect_fixed_new_list,fixed_assigned=defect_fixed_assigned_list,test=defect_test_list,age=defect_age_list)
+    meet_sla_list = DurSLA[5]
+    return render_template('tqcPage.html', datas=rows, new_durations=defect_new_list,fixed_new=defect_fixed_new_list,fixed_assigned=defect_fixed_assigned_list,test=defect_test_list,age=defect_age_list,meetsla=meet_sla_list)
 
 
 if __name__ == "__main__":

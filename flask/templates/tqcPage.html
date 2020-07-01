@@ -40,8 +40,6 @@
   </head>
   <body>
     <h2 style="margin-top:20px; text-align: center;">Defect details</h2>
-    {{durations}}
-    {{sla}}
     <div style="margin: 10px 20px 0px 20px;">
       <table class="table table-fluid" id="myTable">
         <thead>
@@ -63,12 +61,13 @@
             {% set fixedass = fixed_assigned[loop.index-1] %}
             {% set test = test[loop.index-1] %}
             {% set age = age[loop.index-1] %}
+            {% set sla = meetsla[loop.index-1] %}
           <tr>
-            <td style="width: 300px;">{{row.0}}</td>
+            <td style="width: 290px;">{{row.0}}</td>
             <td style="width: 90px; text-align: center;">{{row.5}}</td>
-            <td style="width: 430px;">{{row.8}}</td>
+            <td style="width: 400px;">{{row.8}}</td>
             <td style="width: 160px;">{{row.10}}</td>
-            <td>
+            <td style="width: 200px;">
               <button class="btn btn-light" type="button" data-toggle="collapse" data-target="#date{{row.5}}" aria-expanded="false" aria-controls="date{{row.5}}">
                 Click to see date
               </button>
@@ -93,7 +92,7 @@
                 </div>
               </div>
             </td>
-            <td>
+            <td style="width: 200px;">
               <button class="btn btn-light" type="button" data-toggle="collapse" data-target="#dur{{row.5}}" aria-expanded="false" aria-controls="dur{{row.5}}">
                 Click to see duration
               </button>
@@ -103,21 +102,21 @@
                   {{newdu}}
                   <br>
                   <b>Defect fixed new duration:</b><br>
-                  <p> {{fixednew}} </p>
+                  {{fixednew}}
                   <br>
                   <b>Defect fixed assigned duration:</b><br>
-                  <p> {{fixedass}} </p>
+                  {{fixedass}}
                   <br>
                   <b>Defect test duration:</b><br>
-                  <p> {{test}} </p>
+                  {{test}}
                   <br>
                   <b>Defect age duration:</b><br>
-                  <p> {{age}} </p>
+                  {{age}}
                 </div>
               </div>
             </td>
-            <td>
-              sla
+            <td style="width: 100px;">
+              {{sla}}
             </td>
           </tr>
           {% endfor %}
@@ -138,7 +137,4 @@
 </html>
 
 <style>
-  th{
-    text-align: center;
-  }
 </style>

@@ -243,7 +243,7 @@ def tqcCalculate(connect,df):
     df['DFECCT_REASSIGNED10_DURATION'] = defect_reassigned_list10
 
     Dur_SLA=[]
-    Dur_SLA.extend([defect_new_list,defect_fixed_new_list,defect_fixed_assigned_list,defect_test_list,defect_age_list])
+    Dur_SLA.extend([defect_new_list, defect_fixed_new_list, defect_fixed_assigned_list, defect_test_list, defect_age_list, meet_sla_list])
 
     return Dur_SLA
     #  3. Save to file
