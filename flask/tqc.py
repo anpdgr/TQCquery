@@ -5,6 +5,7 @@ from business_duration import businessDuration
 import holidays as pyholidays
 from datetime import time, date, datetime
 import math
+import sla
 
 app = Flask(__name__)
 
@@ -277,6 +278,12 @@ for index, row in df.iterrows():
             defect_fixed_assigned_duration = 0
     defect_fixed_assigned_list.append(defect_fixed_assigned_duration)
 
+    # calculate SLA
+    if current_project_name.startswith('CPC'):
+        sla_status = sla.calculate_sla(project_group='CPC',severity_name=current_severity_name,priority_name=current_priority_name,defect_status=current_main_defect_status,defect_fixed_new_duration=defect_fixed_new_duration)
+    else:
+        sla_status = sla.calculate_sla(severity_name=current_severity_name,priority_name=current_priority_name,defect_status=current_main_defect_status,defect_fixed_new_duration=defect_fixed_new_duration)
+    meet_sla_list.append(sla_status)
 
 @app.route("/")
 def mainTable():
@@ -284,7 +291,7 @@ def mainTable():
     cur.execute(sql)
     rows = cur.fetchall()
     connect.commit()
-    return render_template('tqcPage.html', datas=rows, new_durations=defect_new_list,fixed_new=defect_fixed_new_list,fixed_assigned=defect_fixed_assigned_list,test=defect_test_list,age=defect_age_list)
+    return render_template('tqcPage.html', datas=rows, new_durations=defect_new_list,fixed_new=defect_fixed_new_list,fixed_assigned=defect_fixed_assigned_list,test=defect_test_list,age=defect_age_list,meetsla=meet_sla_list)
 
 
 if __name__ == "__main__":
