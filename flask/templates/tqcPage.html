@@ -57,6 +57,7 @@
         </thead>
         <tbody>
           {% for row in datas %}
+          <!-- {% for i in new_durations %} -->
           <tr>
             <td style="width: 300px;">{{row.0}}</td>
             <td style="width: 90px; text-align: center;">{{row.5}}</td>
@@ -94,6 +95,7 @@
               <div class="collapse" id="dur{{row.5}}">
                 <div class="card-body"> 
                   <b>Defect new duration:</b><br>
+                  <!-- {{i}} -->
                   <br>
                   <b>Defect fixed new duration:</b><br>
                   <br>
@@ -109,6 +111,7 @@
               sla
             </td>
           </tr>
+          <!-- {% endfor %} -->
           {% endfor %}
         </tbody>
       </table>

@@ -240,15 +240,13 @@ for index, row in df.iterrows():
             defect_fixed_new_duration = 0
     defect_fixed_new_list.append(defect_fixed_new_duration)
 
-
 @app.route("/")
 def mainTable():
     cur = connect.cursor()
     cur.execute(sql)
     rows = cur.fetchall()
     connect.commit()
-
-    return render_template('tqcPage.html', datas=rows, durations=defect_new_list)
+    return render_template('tqcPage.html', datas=rows, new_durations=defect_new_list)
 
 
 if __name__ == "__main__":
