@@ -58,8 +58,7 @@
         <tbody>
           {% for i in datas %}
           {% set row = datas[loop.index0] %}
-          {% set new_dur = new_durations[loop.index0] %}
-          {{new_dur}}
+          {% set newdu = new_durations[loop.index0] %}
           <tr>
             <td style="width: 300px;">{{row.0}}</td>
             <td style="width: 90px; text-align: center;">{{row.5}}</td>
@@ -97,7 +96,7 @@
               <div class="collapse" id="dur{{row.5}}">
                 <div class="card-body"> 
                   <b>Defect new duration:</b><br>
-                  {{i}}
+                  {{newdu}}
                   <br>
                   <b>Defect fixed new duration:</b><br>
                   <br>
@@ -120,7 +119,11 @@
 
     <script>
       $(document).ready(function () {
-        $("#myTable").DataTable();
+        $("#myTable").DataTable(
+          {
+            "ordering":false
+          }
+        );
       });
     </script>
   </body>

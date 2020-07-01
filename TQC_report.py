@@ -171,11 +171,12 @@ LEFT OUTER JOIN defect_log defect_log_ready ON (defect_log_ready.defect_id = def
 LEFT OUTER JOIN defect_log defect_log_closed ON (defect_log_closed.defect_id = defect.defect_id) and (defect_log_closed.sub_id = sub_defect.sub_run_id) AND (defect_log_closed.new_value = 'Closed')
 order by project.project_id, defect.defect_run_id , sub_defect.SUB_RUN_ID
 ) 
-where  row_num=1 
+where  row_num=1 and rownum <= 30
 """
 
 SQL_Query = pd.read_sql_query(sql,connect)
 df = pd.DataFrame(SQL_Query)
+print(df)
 # print(df)
 
 # defect_log
@@ -397,7 +398,7 @@ df['DFECCT_REASSIGNED10_DURATION'] = defect_reassigned_list10
 
 
 #  3. Save to file
-df.to_csv("TQC_query_results_"+str(datetime.now().strftime("%Y-%m-%d %H%M%S"))+".csv",index=False,header=True,encoding='utf-8-sig')
+#df.to_csv("TQC_query_results_"+str(datetime.now().strftime("%Y-%m-%d %H%M%S"))+".csv",index=False,header=True,encoding='utf-8-sig')
 
 
 

@@ -361,6 +361,6 @@ df['DFECCT_REASSIGNED8_DURATION'] = defect_reassigned_list8
 df['DFECCT_REASSIGNED9_DURATION'] = defect_reassigned_list9
 df['DFECCT_REASSIGNED10_DURATION'] = defect_reassigned_list10
 
-
+print(df)
 #  3. Save to file
-df.to_csv("TQC_query_results_"+str(datetime.now().strftime("%Y-%m-%d %H%M%S"))+".csv",index=False,header=True,encoding='utf-8-sig')
+# df.to_csv("TQC_query_results_"+str(datetime.now().strftime("%Y-%m-%d %H%M%S"))+".csv",index=False,header=True,encoding='utf-8-sig')

@@ -145,7 +145,6 @@ where  row_num=1 and rownum <= 30
 
 SQL_Query = pd.read_sql_query(sql,connect)
 df = pd.DataFrame(SQL_Query)
-# print(df)
 
 # defect_log
 sql_defect_log = pd.read_sql_query("""select Defect_ID,SUB_ID,New_Value,LAST_MODIFIED from defect_log where field_id=10017""",connect)
