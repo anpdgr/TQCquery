@@ -240,13 +240,51 @@ for index, row in df.iterrows():
             defect_fixed_new_duration = 0
     defect_fixed_new_list.append(defect_fixed_new_duration)
 
+    # calculate test days ( ready_to_test_date -> closed_date )
+    defect_test_duration = 0
+    if ready_to_test_date != '' and closed_date != '':
+        
+        if current_project_name.startswith('CPC'):
+            defect_test_duration = businessDuration(startdate=ready_to_test_date,enddate=closed_date,weekendlist=[],unit=unit_hour)
+        else:
+            defect_test_duration = businessDuration(startdate=ready_to_test_date,enddate=closed_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
+        
+        if math.isnan(defect_test_duration):
+            defect_test_duration = 0
+    defect_test_list.append(defect_test_duration)
+
+
+    # calculate age days ( detected_date -> closed_date)
+    defect_age_duration = 0
+    if new_date != '' and closed_date != '':
+        if current_project_name.startswith('CPC'):
+            defect_age_duration =  businessDuration(startdate=new_date,enddate=closed_date,weekendlist=[],unit=unit_hour)
+        else:
+            defect_age_duration =  businessDuration(startdate=new_date,enddate=closed_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
+        if math.isnan(defect_age_duration):
+            defect_age_duration = 0
+    defect_age_list.append(defect_age_duration)
+
+    # ( assigned_date -> ready_to_test_date ) 
+    defect_fixed_assigned_duration = 0
+    if assigned_date != '' and ready_to_test_date != '':
+        if current_project_name.startswith('CPC'):
+            defect_fixed_assigned_duration = businessDuration(startdate=assigned_date,enddate=ready_to_test_date,weekendlist=[],unit=unit_hour)
+        else:
+            defect_fixed_assigned_duration = businessDuration(startdate=assigned_date,enddate=ready_to_test_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
+        
+        if math.isnan(defect_fixed_assigned_duration):
+            defect_fixed_assigned_duration = 0
+    defect_fixed_assigned_list.append(defect_fixed_assigned_duration)
+
+
 @app.route("/")
 def mainTable():
     cur = connect.cursor()
     cur.execute(sql)
     rows = cur.fetchall()
     connect.commit()
-    return render_template('tqcPage.html', datas=rows, new_durations=defect_new_list)
+    return render_template('tqcPage.html', datas=rows, new_durations=defect_new_list,fixed_new=defect_fixed_new_list,fixed_assigned=defect_fixed_assigned_list,test=defect_test_list,age=defect_age_list)
 
 
 if __name__ == "__main__":
