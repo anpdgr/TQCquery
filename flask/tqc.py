@@ -1,63 +1,15 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for, flash, session
 import cx_Oracle
 import pandas as pd
 from business_duration import businessDuration
 import holidays as pyholidays
 from datetime import time, date, datetime
 import math
-import sla
+import TQC_report_v5
 
 app = Flask(__name__)
+app.secret_key = "super secret key"
 
-# Business open hour must be in standard python time format-Hour,Min,Sec
-biz_open_time = time(10, 0, 0)
-
-# Business close hour must be in standard python time format-Hour,Min,Sec
-biz_close_time = time(18, 0, 0)
-
-# Business duration can be 'day', 'hour', 'min', 'sec'
-unit_hour = 'hour'
-
-# Thailand public holidays
-Thai_holiday_list = {
-    date(2019, 1, 1): "วันปีใหม่",
-    date(2019, 2, 5): "ตรุษจีน",
-    date(2019, 2, 6): "ตรุษจีน",
-    date(2019, 2, 19): "มาฆบูชา",
-    date(2019, 4, 8): "ชดเชยวันจักรี",
-    date(2019, 4, 15): "สงกรานต์",
-    date(2019, 4, 16): "สงกรานต์",
-    date(2019, 5, 1): "แรงงาน",
-    date(2019, 5, 6): "วันพระราชพิธีบรมราชาภิเษก",
-    date(2019, 5, 20): "ชดเชยวันวิสาขบูชา",
-    date(2019, 6, 3): "วันราชินี",
-    date(2019, 7, 16): "ชดเชยอาสาฬหบูชา",
-    date(2019, 7, 29): "ชดเชย ร10",
-    date(2019, 8, 12): "วันแม่",
-    date(2019, 10, 14): "ชดเชย ร9",
-    date(2019, 10, 23): "ร5 ปิยมหาราช",
-    date(2019, 12, 5): "วันพ่อ",
-    date(2019, 12, 10): "วันรัฐธรรมนูญ",
-    date(2019, 12, 31): "สิ้นปี",
-    date(2020, 1, 1): "วันปีใหม่",
-    date(2020, 1, 27): "ตรุษจีน",
-    date(2020, 2, 10): "ชดเชยมาฆบูชา",
-    date(2020, 4, 6): "วันจักรี",
-    date(2020, 4, 13): "สงกรานต์",
-    date(2020, 4, 14): "สงกรานต์",
-    date(2020, 4, 15): "สงกรานต์",
-    date(2020, 5, 1): "แรงงาน",
-    date(2020, 5, 4): "ฉัตรมงคล",
-    date(2020, 5, 6): "วันวิสาขบูชา",
-    date(2020, 6, 3): "วันราชินี",
-    date(2020, 7, 6): "ชดเชยอาสาฬหบูชา",
-    date(2020, 7, 28): "ร10",
-    date(2020, 8, 12): "วันแม่",
-    date(2020, 10, 13): "ร9",
-    date(2020, 10, 23): "ร5 ปิยมหาราช",
-    date(2020, 12, 7): "ชดเชยวันพ่อ",
-    date(2020, 12, 31): "สิ้นปี"
-}
 
 dsn_string = """(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=172.19.195.170)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=TQCPRD)))"""
 try:
@@ -106,6 +58,8 @@ defect_log_fixed.last_modified as Fixed_Date,
 defect_log_request.last_modified as Request_To_Deploy_Date,
 defect_log_ready.last_modified as Ready_To_Test_Date,
 defect_log_closed.last_modified as Closed_Date,
+RELEASE_START as Start_Date,
+RELEASE_End as End_Date,
 NULL as Defect_New_Duration,
 NULL as Defect_Fixed_New_Duration,
 NULL as Defect_Fixed_Assigned_Duration,
@@ -146,144 +100,15 @@ where  row_num=1 and rownum <= 30
 
 SQL_Query = pd.read_sql_query(sql,connect)
 df = pd.DataFrame(SQL_Query)
-# print(df)
 
-# defect_log
-sql_defect_log = pd.read_sql_query("""select Defect_ID,SUB_ID,New_Value,LAST_MODIFIED from defect_log where field_id=10017""",connect)
-df_log = pd.DataFrame(sql_defect_log)
-
-defect_new_list = []   
-defect_fixed_new_list = []
-defect_fixed_assigned_list = []
-defect_test_list = []
-defect_age_list = []
-meet_sla_list = []
-#defect_reassigned_list = [None]*10
-defect_reassigned_list1 = []
-defect_reassigned_list2 = []
-defect_reassigned_list3 = []
-defect_reassigned_list4 = []
-defect_reassigned_list5 = []
-defect_reassigned_list6 = []
-defect_reassigned_list7 = []
-defect_reassigned_list8 = []
-defect_reassigned_list9 = []
-defect_reassigned_list10 = []
-
-# main loop
-for index, row in df.iterrows():
-    current_defect_id = row['DEFECT_ID']
-    current_sub_defect_no = row['SUB_DEFECT_NO']
-    current_main_defect_status = row['MAIN_DEFECT_STATUS']
-    current_severity_name = row['SEVERITY_NAME']
-    current_priority_name = row['PRIORITY_NAME']
-    current_project_name = row['PROJECT_NAME']
-
-    df_log_temp = df_log.query('DEFECT_ID == ' + str(current_defect_id) + ' and (SUB_ID == '  + str(current_sub_defect_no) + ' or SUB_ID == "NaN")' ).sort_values(by='LAST_MODIFIED')
-
-
-    new_date = assigned_date = ready_to_test_date = closed_date = ""
-    reassigned_flag = False
-    reassigned_date_list = []
-    ready_to_test_date_list = []
-
-
-#assign ค่าพวก new_date, assigned_date จาก log เพื่อนำไปคำนวณ durations
-    for index, row in df_log_temp.iterrows():            
-        if row['NEW_VALUE'] == 'New':
-            new_date = pd.to_datetime(row['LAST_MODIFIED'],dayfirst=True)
-        if row['NEW_VALUE'] == 'Assigned':
-            assigned_date = pd.to_datetime(row['LAST_MODIFIED'],dayfirst=True)
-        if row['NEW_VALUE'] == 'Request to Deploy':      # ของเดิมคิดที่ Ready to Test
-            ready_to_test_date = pd.to_datetime(row['LAST_MODIFIED'],dayfirst=True)
-            if (reassigned_flag):
-                ready_to_test_date_list.append(ready_to_test_date)
-        if row['NEW_VALUE'] == 'Re-Assigned':
-            reassigned_date = pd.to_datetime(row['LAST_MODIFIED'],dayfirst=True)
-            reassigned_date_list.append(reassigned_date)
-            reassigned_flag = True
-        if row['NEW_VALUE'] == 'Closed':
-            closed_date = pd.to_datetime(row['LAST_MODIFIED'],dayfirst=True)
-        if row['NEW_VALUE'] == 'Re-New': # ถ้ามีการ renew ให้วันที่เริ่มต้นเจอ defect ป็น renew date แทน`
-            new_date = pd.to_datetime(row['LAST_MODIFIED'],dayfirst=True) 
-
-    # if no closed_date, then it's now.
-    if closed_date == '':
-        closed_date = datetime.now()
- # calculate new duration
-    defect_new_duration = 0
-    if new_date != '' and assigned_date != '':
-        if current_project_name.startswith('CPC'):
-            defect_new_duration = businessDuration(startdate=new_date,enddate=assigned_date,weekendlist=[],unit=unit_hour)
-        else:
-            defect_new_duration = businessDuration(startdate=new_date,enddate=assigned_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
-        
-        #print("defect_new_duration: {}".format(defect_new_duration))
-        if math.isnan(defect_new_duration):
-            defect_new_duration = 0
-            # print("defect_new_duration_issue")
-            # print("new_date: {}".format(new_date))
-            # print("assigned_date: {}\n".format(assigned_date))
-    defect_new_list.append(defect_new_duration)
-
-
-    # calculate fixed days ( detected_date -> ready_to_test_date )
-    defect_fixed_new_duration = 0
-    # ในกรณีที่ยังมีวัน ready to test  ให้เอาวันที่ปัจจุบันแทน
-    if ready_to_test_date == '':
-        ready_to_test_date = datetime.now()
-    if new_date != '' and ready_to_test_date != '':
-        if current_project_name.startswith('CPC'):
-            defect_fixed_new_duration = businessDuration(startdate=new_date,enddate=ready_to_test_date,weekendlist=[],unit=unit_hour)
-        else:
-            defect_fixed_new_duration = businessDuration(startdate=new_date,enddate=ready_to_test_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
-        if math.isnan(defect_fixed_new_duration):
-            defect_fixed_new_duration = 0
-    defect_fixed_new_list.append(defect_fixed_new_duration)
-
-    # calculate test days ( ready_to_test_date -> closed_date )
-    defect_test_duration = 0
-    if ready_to_test_date != '' and closed_date != '':
-        
-        if current_project_name.startswith('CPC'):
-            defect_test_duration = businessDuration(startdate=ready_to_test_date,enddate=closed_date,weekendlist=[],unit=unit_hour)
-        else:
-            defect_test_duration = businessDuration(startdate=ready_to_test_date,enddate=closed_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
-        
-        if math.isnan(defect_test_duration):
-            defect_test_duration = 0
-    defect_test_list.append(defect_test_duration)
-
-
-    # calculate age days ( detected_date -> closed_date)
-    defect_age_duration = 0
-    if new_date != '' and closed_date != '':
-        if current_project_name.startswith('CPC'):
-            defect_age_duration =  businessDuration(startdate=new_date,enddate=closed_date,weekendlist=[],unit=unit_hour)
-        else:
-            defect_age_duration =  businessDuration(startdate=new_date,enddate=closed_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
-        if math.isnan(defect_age_duration):
-            defect_age_duration = 0
-    defect_age_list.append(defect_age_duration)
-
-    # ( assigned_date -> ready_to_test_date ) 
-    defect_fixed_assigned_duration = 0
-    if assigned_date != '' and ready_to_test_date != '':
-        if current_project_name.startswith('CPC'):
-            defect_fixed_assigned_duration = businessDuration(startdate=assigned_date,enddate=ready_to_test_date,weekendlist=[],unit=unit_hour)
-        else:
-            defect_fixed_assigned_duration = businessDuration(startdate=assigned_date,enddate=ready_to_test_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
-        
-        if math.isnan(defect_fixed_assigned_duration):
-            defect_fixed_assigned_duration = 0
-    defect_fixed_assigned_list.append(defect_fixed_assigned_duration)
-
-    # calculate SLA
-    if current_project_name.startswith('CPC'):
-        sla_status = sla.calculate_sla(project_group='CPC',severity_name=current_severity_name,priority_name=current_priority_name,defect_status=current_main_defect_status,defect_fixed_new_duration=defect_fixed_new_duration)
-    else:
-        sla_status = sla.calculate_sla(severity_name=current_severity_name,priority_name=current_priority_name,defect_status=current_main_defect_status,defect_fixed_new_duration=defect_fixed_new_duration)
-    meet_sla_list.append(sla_status)
+DurSLA = TQC_report_v5.tqcCalculate(connect,df)
+defect_new_list = DurSLA[0]
+defect_fixed_new_list = DurSLA[1]
+defect_fixed_assigned_list = DurSLA[2]
+defect_test_list = DurSLA[3]
+defect_age_list = DurSLA[4]
+meet_sla_list = DurSLA[5]
+dfExport = DurSLA[6]
 
 @app.route("/")
 def mainTable():
@@ -292,6 +117,13 @@ def mainTable():
     rows = cur.fetchall()
     connect.commit()
     return render_template('tqcPage.html', datas=rows, new_durations=defect_new_list,fixed_new=defect_fixed_new_list,fixed_assigned=defect_fixed_assigned_list,test=defect_test_list,age=defect_age_list,meetsla=meet_sla_list)
+
+@app.route("/export")
+def export():
+    filename = "TQC_query_results_"+str(datetime.now().strftime("%Y-%m-%d %H%M%S"))+".csv"
+    dfExport.to_csv(filename,index=False,header=True,encoding='utf-8-sig')
+    flash("Exported as "+filename)
+    return redirect(url_for('mainTable'))
 
 
 if __name__ == "__main__":

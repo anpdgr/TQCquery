@@ -1,164 +1,273 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Defect details</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+      integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
 
-<head>
-  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Defect details</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
-    integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous" />
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
-    integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
-    crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
-    integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
-    crossorigin="anonymous"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+      integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+      integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="http://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+  </head>
+  <body>
+    <div style="margin-top: 15px; text-align: center;">
+      <h2>Defect details</h2>
+    </div>
 
-  <script src="http://code.jquery.com/jquery-3.3.1.min.js"
-    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" />
-  <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-</head>
+    <div style="float: left; margin-left: 25px;">
+      <a href="/export" style="color: #d11141; text-decoration: underline;"
+        ><i class="fa fa-file-excel-o" style="font-size: 24px;"> </i> Export as
+        CSV file</a
+      >
+    </div>
+    <div style="float: left; margin-left: 30px;">
+      {% for message in get_flashed_messages() %}
+      <p>{{ message }}</p>
+      {% endfor %}
+    </div>
 
-<body>
-  <h2 style="margin-top:20px; text-align: center;">Defect details</h2>
-  {{durations}}
-  {{sla}}
-  <div style="margin: 10px 20px 0px 20px;">
+    <div class="oneline" style="float: right; margin-right: 40px;">
+      <label for="end">End date: </label>
+      <input class="date_range_filter date" type="text" id="datepicker_to" />
+    </div>
+    <div class="oneline" style="float: right; margin-right: 20px;">
+      <label for="start">Start date: </label>
+      <input class="date_range_filter date" type="text" id="datepicker_from" />
+    </div>
 
-          <label>Start Date :</label>
-          <input type="text" id="start" name="start" onkeyup="searchQA()">
-          <label>End Date :</label>
-          <input type="text" id="end" name="end">
-
-    <table class="table table-fluid" id="myTable">
-      <thead>
-        <tr>
-          <th>Project name</th>
-          <th>Defect ID</th>
-          <th>Defect summary</th>
-          <th>Main defect status</th>
-          <th>Date</th>
-          <th>Duration</th>
-          <th>Meet SLA</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for i in datas %}
-        {% set row = datas[loop.index-1] %}
-        {% set newdu = new_durations[loop.index-1] %}
-        {% set fixednew = fixed_new[loop.index-1] %}
-        {% set fixedass = fixed_assigned[loop.index-1] %}
-        {% set test = test[loop.index-1] %}
-        {% set age = age[loop.index-1] %}
-        {% set sla = meetsla[loop.index-1] %}
-        <tr>
-          <td style="width: 300px;">{{row.0}}</td>
-          <td style="width: 90px; text-align: center;">{{row.5}}</td>
-          <td style="width: 430px;">{{row.8}}</td>
-          <td style="width: 160px;">{{row.10}}</td>
-          <td>
-            <button class="btn btn-light" type="button" data-toggle="collapse" data-target="#date{{row.5}}"
-              aria-expanded="false" aria-controls="date{{row.5}}">
-              Click to see date
-            </button>
-            <div class="collapse" id="date{{row.5}}">
-              <div class="card-body">
-                <span>
-                  <b>Defect date:</b><br>
-                  {{row.29}}
-                  <br>
-                  <b>Assigned date:</b><br>
-                  {{row.31}}
-                  <br>
-                  <b>Renew date:</b><br>
-                  {{row.32}}
-                  <br>
-                  <b>Fixed date:</b><br>
-                  {{row.33}}
-                  <br>
-                  <b>Closed date:</b><br>
-                  {{row.36}}
-                </span>
+    <br /><br />
+    <div style="margin: 10px 20px 10px 20px;">
+      <table class="table table-fluid hover cell-border" id="myTable">
+        <thead style="background-color: #d11141; color: #fffafa;">
+          <tr>
+            <th>Project name</th>
+            <th>Defect ID</th>
+            <th>Defect summary</th>
+            <th>Main defect status</th>
+            <th>Date</th>
+            <th>StartDate</th>
+            <th>EndDate</th>
+            <th>Duration</th>
+            <th>Meet SLA</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i in datas %} {% set row = datas[loop.index-1] %} {% set newdu
+          = new_durations[loop.index-1] %} {% set fixednew =
+          fixed_new[loop.index-1] %} {% set fixedass =
+          fixed_assigned[loop.index-1] %} {% set test = test[loop.index-1] %} {%
+          set age = age[loop.index-1] %} {% set sla = meetsla[loop.index-1] %}
+          <tr>
+            <td style="width: 290px;">{{row.0}}</td>
+            <td style="width: 90px; text-align: center;">{{row.5}}</td>
+            <td style="width: 400px;">{{row.8}}</td>
+            <td style="width: 160px;">{{row.10}}</td>
+            <td style="width: 200px;">
+              <button
+                class="btn btn-light"
+                type="button"
+                data-toggle="collapse"
+                data-target="#date{{row.5}}"
+                aria-expanded="false"
+                aria-controls="date{{row.5}}"
+              >
+                Click to see date
+              </button>
+              <div class="collapse" id="date{{row.5}}">
+                <div class="card-body">
+                  <span>
+                    <b>Defect date:</b><br />
+                    {{row.29}}
+                    <br />
+                    <b>Assigned date:</b><br />
+                    {{row.31}}
+                    <br />
+                    <b>Renew date:</b><br />
+                    {{row.32}}
+                    <br />
+                    <b>Fixed date:</b><br />
+                    {{row.33}}
+                    <br />
+                    <b>Closed date:</b><br />
+                    {{row.36}}
+                  </span>
+                </div>
               </div>
-            </div>
-          </td>
-          <td>
-            <button class="btn btn-light" type="button" data-toggle="collapse" data-target="#dur{{row.5}}"
-              aria-expanded="false" aria-controls="dur{{row.5}}">
-              Click to see duration
-            </button>
-            <div class="collapse" id="dur{{row.5}}">
-              <div class="card-body">
-                <b>Defect new duration:</b><br>
-                <p> {{newdu}} </p>
-                <br>
-                <b>Defect fixed new duration:</b><br>
-                <p> {{fixednew}} </p>
-                <br>
-                <b>Defect fixed assigned duration:</b><br>
-                <p> {{fixedass}} </p>
-                <br>
-                <b>Defect test duration:</b><br>
-                <p> {{test}} </p>
-                <br>
-                <b>Defect age duration:</b><br>
-                <p> {{age}} </p>
+            </td>
+            <td>{{row.37}}</td>
+            <td>{{row.38}}</td>
+            <td style="width: 200px;">
+              <button
+                class="btn btn-light"
+                type="button"
+                data-toggle="collapse"
+                data-target="#dur{{row.5}}"
+                aria-expanded="false"
+                aria-controls="dur{{row.5}}"
+              >
+                Click to see duration
+              </button>
+              <div class="collapse" id="dur{{row.5}}">
+                <div class="card-body">
+                  <b>Defect new duration:</b><br />
+                  {% if newdu != 0 %} {{'%0.4f'| format(newdu)}} hours {% endif
+                  %} {% if newdu == 0 %} {{newdu}} hours {% endif %}
+                  <br />
+                  <b>Defect fixed new duration:</b><br />
+                  {% if fixednew != 0 %} {{'%0.4f'| format(fixednew)}} hours {%
+                  endif %} {% if fixednew == 0 %} {{fixednew}} hours {% endif %}
+                  <br />
+                  <b>Defect fixed assigned duration:</b><br />
+                  {% if fixedass != 0 %} {{'%0.4f'| format(fixedass)}} hours {%
+                  endif %} {% if fixedass == 0 %} {{fixedass}} hours {% endif %}
+                  <br />
+                  <b>Defect test duration:</b><br />
+                  {% if test != 0 %} {{'%0.4f'| format(test)}} hours {% endif %}
+                  {% if test == 0 %} {{test}} hours {% endif %}
+                  <br />
+                  <b>Defect age duration:</b><br />
+                  {% if age != 0 %} {{'%0.4f'| format(age)}} hours {% endif %}
+                  {% if age == 0 %} {{age}} hours {% endif %}
+                </div>
               </div>
-            </div>
-          </td>
-          <td>
-            {{sla}}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+            </td>
+            <td style="width: 100px;">
+              {{sla}}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
-  <script>
-       function searchQA() {
-    // Declare variables
+    <script>
+      $(document).ready(function () {
+        $("#myTable").DataTable({
+          ordering: false,
+        });
+/*
+        $("#datepicker_from")
+          .datepicker({
+            showOn: "button",
+            buttonImage: "images/calendar.gif",
+            buttonImageOnly: false,
+            onSelect: function (date) {
+              minDateFilter = new Date(date).getTime();
+              oTable.fnDraw();
+            },
+          })
+          .keyup(function () {
+            minDateFilter = new Date(this.value).getTime();
+            oTable.fnDraw();
+          });
 
-    var input1, input2, filter1, filter2, table, tr, td, i, txtValue;
+        $("#datepicker_to")
+          .datepicker({
+            showOn: "button",
+            buttonImage: "images/calendar.gif",
+            buttonImageOnly: false,
+            onSelect: function (date) {
+              maxDateFilter = new Date(date).getTime();
+              oTable.fnDraw();
+            },
+          })
+          .keyup(function () {
+            maxDateFilter = new Date(this.value).getTime();
+            oTable.fnDraw();
+          });*/
+      });
+/*
+      minDateFilter = "";
+      maxDateFilter = "";
 
-    input = document.getElementById("start");
+      $.fn.dataTableExt.afnFiltering.push(function (
+        oSettings,
+        aData,
+        iDataIndex
+      ) {
+        if (typeof aData._date == "undefined") {
+          aData._date = new Date(aData[0]).getTime();
+        }
 
-    filter = input.value.toUpperCase();
+        if (minDateFilter && !isNaN(minDateFilter)) {
+          if (aData._date < minDateFilter) {
+            return false;
+          }
+        }
 
-    table = document.getElementById("myTable");
+        if (maxDateFilter && !isNaN(maxDateFilter)) {
+          if (aData._date > maxDateFilter) {
+            return false;
+          }
+        }
 
-    tr = table.getElementsByTagName("tr");
+        return true;
+      });*/
 
-    // Loop through all table rows, and hide those who don't match the search query
+/*      function Start() {
+        sDate = document.getElementById("start").value;
 
-    for (i = 0; i < tr.length; i++) {
-      td = tr[i].getElementsByTagName("td")[4];
-
-      if ( td ) {
-        txtValue = td.textContent || td.innerText;
-
-        if (
-          txtValue.toUpperCase().indexOf(filter) > -1 
-        ) {
-          tr[i].style.display = "";
-        } else {
-          tr[i].style.display = "none";
+        table = document.getElementById("myTable");
+        tr = table.getElementsByTagName("tr");
+        for (i = 0; i < tr.length; i++) {
+          td = tr[i].getElementsByTagName("td")[4];
+          if (td) {
+            txtValue = td.textContent || td.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+              tr[i].style.display = "";
+            } else {
+              tr[i].style.display = "none";
+            }
+          }
         }
       }
-    }
-  }
-  </script>
-</body>
 
+      function End() {
+        eDate = document.getElementById("end").value;
+      }*/
+
+    </script>
+  </body>
 </html>
 
 <style>
-  th {
-    text-align: center;
+  body {
+    background-color: rgba(255, 0, 0, 0.009);
+  }
+  .oneline {
+    display: inline-block;
   }
 </style>
