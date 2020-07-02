@@ -29,17 +29,12 @@
   {{durations}}
   {{sla}}
   <div style="margin: 10px 20px 0px 20px;">
-    <table border="0" cellspacing="5" cellpadding="5">
-      <tbody>
-        <tr>
-          <td style="width: 80%;"></td>
-          <td style="width: 5%;">Start Date :</td>
-          <td><input type="date" id="start" name="start"></td>
-          <td style="width: 5%;">End Date :</td>
-          <td><input type="date" id="end" name="end"></td>
-        </tr>
-      </tbody>
-    </table>
+
+          <label>Start Date :</label>
+          <input type="text" id="start" name="start" onkeyup="searchQA()">
+          <label>End Date :</label>
+          <input type="text" id="end" name="end">
+
     <table class="table table-fluid" id="myTable">
       <thead>
         <tr>
@@ -126,29 +121,37 @@
   </div>
 
   <script>
-    $.fn.dataTable.ext.search.push(
-      function (settings, data, dataIndex) {
-        var start = $('#start').val();
-        var end = $('#end').val();
-        var pdate = data[4] || NaN ; // use data for the age column
+       function searchQA() {
+    // Declare variables
 
-        if ((isNaN(start) && isNaN(end)) ||
-          (isNaN(start) && age == end) ||
-          (min == pdate && isNaN(end)) ||
-          (min == pdate && age == end)) {
-          return true;
+    var input1, input2, filter1, filter2, table, tr, td, i, txtValue;
+
+    input = document.getElementById("start");
+
+    filter = input.value.toUpperCase();
+
+    table = document.getElementById("myTable");
+
+    tr = table.getElementsByTagName("tr");
+
+    // Loop through all table rows, and hide those who don't match the search query
+
+    for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName("td")[4];
+
+      if ( td ) {
+        txtValue = td.textContent || td.innerText;
+
+        if (
+          txtValue.toUpperCase().indexOf(filter) > -1 
+        ) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
         }
-        return false;
       }
-    );
-    $(document).ready(function () {
-      var table = $('#myTable').DataTable();
-
-      // Event listener to the two range filtering inputs to redraw on input
-      $('#start, #end').keyup(function () {
-        table.draw();
-      });
-    });
+    }
+  }
   </script>
 </body>
 
