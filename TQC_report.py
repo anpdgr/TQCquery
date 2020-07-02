@@ -33,7 +33,7 @@ from business_duration import businessDuration
 import holidays as pyholidays
 from datetime import time,date,datetime
 import math
-import sla
+import './flask/sla'
 
 
 #Business open hour must be in standard python time format-Hour,Min,Sec
