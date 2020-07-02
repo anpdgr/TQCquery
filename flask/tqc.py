@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for, flash, session
 import cx_Oracle
 import pandas as pd
 from business_duration import businessDuration
@@ -8,6 +8,7 @@ import math
 import TQC_report_v5
 
 app = Flask(__name__)
+app.secret_key = "super secret key"
 
 
 dsn_string = """(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=172.19.195.170)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=TQCPRD)))"""
@@ -98,20 +99,29 @@ where  row_num=1 and rownum <= 30
 SQL_Query = pd.read_sql_query(sql,connect)
 df = pd.DataFrame(SQL_Query)
 
+DurSLA = TQC_report_v5.tqcCalculate(connect,df)
+defect_new_list = DurSLA[0]
+defect_fixed_new_list = DurSLA[1]
+defect_fixed_assigned_list = DurSLA[2]
+defect_test_list = DurSLA[3]
+defect_age_list = DurSLA[4]
+meet_sla_list = DurSLA[5]
+dfExport = DurSLA[6]
+
 @app.route("/")
 def mainTable():
     cur = connect.cursor()
     cur.execute(sql)
     rows = cur.fetchall()
     connect.commit()
-    DurSLA = TQC_report_v5.tqcCalculate(connect,df)
-    defect_new_list = DurSLA[0]
-    defect_fixed_new_list = DurSLA[1]
-    defect_fixed_assigned_list = DurSLA[2]
-    defect_test_list = DurSLA[3]
-    defect_age_list = DurSLA[4]
-    meet_sla_list = DurSLA[5]
     return render_template('tqcPage.html', datas=rows, new_durations=defect_new_list,fixed_new=defect_fixed_new_list,fixed_assigned=defect_fixed_assigned_list,test=defect_test_list,age=defect_age_list,meetsla=meet_sla_list)
+
+@app.route("/export")
+def export():
+    filename = "TQC_query_results_"+str(datetime.now().strftime("%Y-%m-%d %H%M%S"))+".csv"
+    dfExport.to_csv(filename,index=False,header=True,encoding='utf-8-sig')
+    flash("Exported as "+filename)
+    return redirect(url_for('mainTable'))
 
 
 if __name__ == "__main__":
