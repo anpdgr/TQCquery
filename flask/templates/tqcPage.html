@@ -1,222 +1,188 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Defect details</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
-      integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-    />
 
-    <script
-      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
-      integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
-      integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="http://code.jquery.com/jquery-3.3.1.min.js"
-      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-      crossorigin="anonymous"
-    ></script>
-    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Defect details</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+    integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js" integrity="sha512-rmZcZsyhe0/MAjquhTgiUcb4d9knaFc7b5xAfju483gbEXTkeJRUMIPk6s3ySZMYUHEcjKbjLjyddGWMrNEvZg==" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+    integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+    integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+    crossorigin="anonymous"></script>
+  <script src="http://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
 
-  </head>
-  <body>
-    <div style="margin-top: 15px; text-align: center;">
-      <h2>Defect details</h2>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"
+    integrity="sha512-rmZcZsyhe0/MAjquhTgiUcb4d9knaFc7b5xAfju483gbEXTkeJRUMIPk6s3ySZMYUHEcjKbjLjyddGWMrNEvZg=="
+    crossorigin="anonymous"></script>
+
+</head>
+
+<body>
+  <div style="margin-top: 15px; text-align: center;">
+    <h2>Defect details</h2>
+  </div>
+
+  <div style="float: left; margin-left: 25px;">
+    <a href="/export" style="color: #d11141; text-decoration: underline;"><i class="fa fa-file-excel-o"
+        style="font-size: 24px;"> </i> Export all data as
+      CSV file</a>
+  </div>
+  <div style="float: left; margin-left: 30px;">
+    {% for message in get_flashed_messages() %}
+    <p>{{ message }}</p>
+    {% endfor %}
+  </div>
+
+  <!-- filter by date -->
+  <div class="container" style="position: relative; left: 650px;
+  width: 700px;
+  padding: 10px;">
+    <!-- Nav pills -->
+    <ul class="nav nav-pills" role="tablist" style="position: relative; left: 200px;">
+      <li class="nav-item">
+        <a class="btn btn-info nav-link active" data-toggle="pill" href="#searchProject">Search by Project name</a>
+      </li>
+      <li class="nav-item">
+        <a class="btn btn-info nav-link" data-toggle="pill" href="#searchDate">Search by Start/End Date</a>
+      </li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+      <div id="searchProject" class="container tab-pane active"><br>
+        <form action="/">
+        <div class="row" style="position: relative; left: 130px;">
+            <label>ProJect Name : &nbsp;</label>
+            <input class="form-control col" type="text" id="projects" >
+            <div class="col">
+              <button class="btn btn-outline-danger" type="submit">search</button>
+            </div>
+        </div>
+      </form>
+      </div>
+      <div id="searchDate" class="container tab-pane fade"><br>
+        <form action="/">
+          <div class="row">
+              <label>Start Date : &nbsp;</label>
+              <input class="form-control col" type="date" id="start">
+              <label>End Date : &nbsp;</label>
+              <input class="form-control col" type="date" id="end">
+              <div class="col">
+              <button class="btn btn-outline-danger" type="submit">search</button>
+              </div>
+          </div>
+        </form>
+      </div>
     </div>
-
-    <div style="float: left; margin-left: 25px;">
-      <a href="/export" style="color: #d11141; text-decoration: underline;"
-        ><i class="fa fa-file-excel-o" style="font-size: 24px;"> </i> Export all data as
-        CSV file</a
-      >
-    </div>
-    <div style="float: left; margin-left: 30px;">
-      {% for message in get_flashed_messages() %}
-      <p>{{ message }}</p>
-      {% endfor %}
-    </div>
-
-<!-- filter by date -->
-    <div class="oneline" style="float: right; margin-right: 40px;">
-      <label for="datefilterfrom">End date: </label>
-      <input type="date" class="form-control" id="datefilterto" data-date-split-input="true">
-    </div>
-    <div class="oneline" style="float: right; margin-right: 20px;">
-      <label for="datefilterfrom">Start date: </label>
-      <input type="date" class="form-control" id="datefilterfrom" data-date-split-input="true">
-    </div>
-
-
-    <br /><br />
-  
-<!-- table -->
-    <div style="margin: 10px 20px 10px 20px;">
-      <table class="table table-fluid hover cell-border" id="myTable">
-        <thead style="background-color: #d11141; color: #fffafa;">
-          <tr>
-            <th>Project name</th>
-            <th>Defect ID</th>
-            <th>Defect summary</th>
-            <th>Main defect status</th>
-            <th>Date</th>
-            <th>StartDate</th>
-            <th>EndDate</th>
-            <th>Duration</th>
-            <th>Meet SLA</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for i in datas %} {% set row = datas[loop.index-1] %} {% set newdu
+  </div>
+  <!-- table -->
+  <div style="margin: 10px 20px 10px 20px;">
+    <table class="table table-fluid hover cell-border" id="myTable">
+      <thead style="background-color: #d11141; color: #fffafa;">
+        <tr>
+          <th>Project name</th>
+          <th>Defect ID</th>
+          <th>Defect summary</th>
+          <th>Main defect status</th>
+          <th>Date</th>
+          <th>StartDate</th>
+          <th>EndDate</th>
+          <th>Duration</th>
+          <th>Meet SLA</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in datas %} {% set row = datas[loop.index-1] %} {% set newdu
           = new_durations[loop.index-1] %} {% set fixednew =
           fixed_new[loop.index-1] %} {% set fixedass =
           fixed_assigned[loop.index-1] %} {% set test = test[loop.index-1] %} {%
           set age = age[loop.index-1] %} {% set sla = meetsla[loop.index-1] %}
-          <tr>
-            <td style="width: 290px;">{{row.0}}</td>
-            <td style="width: 90px; text-align: center;">{{row.5}}</td>
-            <td style="width: 400px;">{{row.8}}</td>
-            <td style="width: 160px;">{{row.10}}</td>
-            <td style="width: 200px;">
-              <button
-                class="btn btn-light"
-                type="button"
-                data-toggle="collapse"
-                data-target="#date{{row.5}}"
-                aria-expanded="false"
-                aria-controls="date{{row.5}}"
-              >
-                Click to see date
-              </button>
-              <div class="collapse" id="date{{row.5}}">
-                <div class="card-body">
-                  <span>
-                    <b>Defect date:</b><br />
-                    {{row.29}}
-                    <br />
-                    <b>Assigned date:</b><br />
-                    {{row.31}}
-                    <br />
-                    <b>Renew date:</b><br />
-                    {{row.32}}
-                    <br />
-                    <b>Fixed date:</b><br />
-                    {{row.33}}
-                    <br />
-                    <b>Closed date:</b><br />
-                    {{row.36}}
-                  </span>
-                </div>
+        <tr>
+          <td style="width: 290px;">{{row.0}}</td>
+          <td style="width: 90px; text-align: center;">{{row.5}}</td>
+          <td style="width: 400px;">{{row.8}}</td>
+          <td style="width: 160px;">{{row.10}}</td>
+          <td style="width: 200px;">
+            <button class="btn btn-light" type="button" data-toggle="collapse" data-target="#date{{row.5}}"
+              aria-expanded="false" aria-controls="date{{row.5}}">
+              Click to see date
+            </button>
+            <div class="collapse" id="date{{row.5}}">
+              <div class="card-body">
+                <span>
+                  <b>Defect date:</b><br />
+                  {{row.29}}
+                  <br />
+                  <b>Assigned date:</b><br />
+                  {{row.31}}
+                  <br />
+                  <b>Renew date:</b><br />
+                  {{row.32}}
+                  <br />
+                  <b>Fixed date:</b><br />
+                  {{row.33}}
+                  <br />
+                  <b>Closed date:</b><br />
+                  {{row.36}}
+                </span>
               </div>
-            </td>
-            <td>{{row.37}}</td>
-            <td>{{row.38}}</td>
-            <td style="width: 200px;">
-              <button
-                class="btn btn-light"
-                type="button"
-                data-toggle="collapse"
-                data-target="#dur{{row.5}}"
-                aria-expanded="false"
-                aria-controls="dur{{row.5}}"
-              >
-                Click to see duration
-              </button>
-              <div class="collapse" id="dur{{row.5}}">
-                <div class="card-body">
-                  <b>Defect new duration:</b><br />
-                  {% if newdu != 0 %} {{'%0.2f'| format(newdu)}} hours {% endif
+            </div>
+          </td>
+          <td>{{row.37}}</td>
+          <td>{{row.38}}</td>
+          <td style="width: 200px;">
+            <button class="btn btn-light" type="button" data-toggle="collapse" data-target="#dur{{row.5}}"
+              aria-expanded="false" aria-controls="dur{{row.5}}">
+              Click to see duration
+            </button>
+            <div class="collapse" id="dur{{row.5}}">
+              <div class="card-body">
+                <b>Defect new duration:</b><br />
+                {% if newdu != 0 %} {{'%0.2f'| format(newdu)}} hours {% endif
                   %} {% if newdu == 0 %} {{newdu}} hours {% endif %}
-                  <br />
-                  <b>Defect fixed new duration:</b><br />
-                  {% if fixednew != 0 %} {{'%0.2f'| format(fixednew)}} hours {%
+                <br />
+                <b>Defect fixed new duration:</b><br />
+                {% if fixednew != 0 %} {{'%0.2f'| format(fixednew)}} hours {%
                   endif %} {% if fixednew == 0 %} {{fixednew}} hours {% endif %}
-                  <br />
-                  <b>Defect fixed assigned duration:</b><br />
-                  {% if fixedass != 0 %} {{'%0.2f'| format(fixedass)}} hours {%
+                <br />
+                <b>Defect fixed assigned duration:</b><br />
+                {% if fixedass != 0 %} {{'%0.2f'| format(fixedass)}} hours {%
                   endif %} {% if fixedass == 0 %} {{fixedass}} hours {% endif %}
-                  <br />
-                  <b>Defect test duration:</b><br />
-                  {% if test != 0 %} {{'%0.2f'| format(test)}} hours {% endif %}
-                  {% if test == 0 %} {{test}} hours {% endif %}
-                  <br />
-                  <b>Defect age duration:</b><br />
-                  {% if age != 0 %} {{'%0.2f'| format(age)}} hours {% endif %}
-                  {% if age == 0 %} {{age}} hours {% endif %}
-                </div>
+                <br />
+                <b>Defect test duration:</b><br />
+                {% if test != 0 %} {{'%0.2f'| format(test)}} hours {% endif %}
+                {% if test == 0 %} {{test}} hours {% endif %}
+                <br />
+                <b>Defect age duration:</b><br />
+                {% if age != 0 %} {{'%0.2f'| format(age)}} hours {% endif %}
+                {% if age == 0 %} {{age}} hours {% endif %}
               </div>
-            </td>
-            <td style="width: 100px;">
-              {{sla}}
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+            </div>
+          </td>
+          <td style="width: 100px;">
+            {{sla}}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 
-    <script>
-      $(document).ready(function () {
-        $("#myTable").DataTable({
-          ordering: false,
-        });
-      });
+</body>
 
-      function filterRows() {
-        var from = $('#datefilterfrom').val();
-        var to = $('#datefilterto').val();
-        //alert("from = "+from);
-
-        if (!from && !to) { // no value for from and to
-          return;
-        }
-
-        from = from || '1970-01-01'; // default from to a old date if it is not set
-        to = to || '2999-12-31';
-
-        var dateFrom = moment(from).format('llll');
-        var dateTo = moment(to).format('llll');
-        //alert("dateFrom = "+dateFrom);
-
-        $('#myTable tr').each(function(i, tr) {
-          var val = $(tr).find("td:nth-child(6)").text();
-          var dateVal = moment(val);
-          var visible = (dateVal.isBetween(dateFrom, dateTo, null, [])) ? "" : "none"; // [] for inclusive
-          $(tr).css('display', visible);
-        });
-      }
-
-      $('#datefilterfrom').on("change", filterRows);
-      $('#datefilterto').on("change", filterRows);
-
-    </script>
-
-  </body>
 </html>
 
 
@@ -224,6 +190,7 @@
   body {
     background-color: rgba(255, 0, 0, 0.009);
   }
+
   .oneline {
     display: inline-block;
   }
