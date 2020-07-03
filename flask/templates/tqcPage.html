@@ -50,6 +50,7 @@
       <h2>Defect details</h2>
     </div>
 
+<!-- export all-->
     <div style="float: left; margin-left: 25px;">
       <a href="/export" style="color: #d11141; text-decoration: underline;"
         ><i class="fa fa-file-excel-o" style="font-size: 24px;"> </i> Export all data as
@@ -60,6 +61,13 @@
       {% for message in get_flashed_messages() %}
       <p>{{ message }}</p>
       {% endfor %}
+    </div>
+<!-- export some -->
+    <div style="float: left; margin-left: 25px;">
+      <a href="/export" style="color: #d11141; text-decoration: underline;"
+        ><i class="fa fa-file-excel-o" style="font-size: 24px;"> </i> Export filtered data as
+        CSV file</a
+      >
     </div>
 
 <!-- filter by date -->
@@ -184,36 +192,9 @@
       $(document).ready(function () {
         $("#myTable").DataTable({
           ordering: false,
+          searching: false
         });
       });
-
-      function filterRows() {
-        var from = $('#datefilterfrom').val();
-        var to = $('#datefilterto').val();
-        //alert("from = "+from);
-
-        if (!from && !to) { // no value for from and to
-          return;
-        }
-
-        from = from || '1970-01-01'; // default from to a old date if it is not set
-        to = to || '2999-12-31';
-
-        var dateFrom = moment(from).format('llll');
-        var dateTo = moment(to).format('llll');
-        //alert("dateFrom = "+dateFrom);
-
-        $('#myTable tr').each(function(i, tr) {
-          var val = $(tr).find("td:nth-child(6)").text();
-          var dateVal = moment(val);
-          var visible = (dateVal.isBetween(dateFrom, dateTo, null, [])) ? "" : "none"; // [] for inclusive
-          $(tr).css('display', visible);
-        });
-      }
-
-      $('#datefilterfrom').on("change", filterRows);
-      $('#datefilterto').on("change", filterRows);
-
     </script>
 
   </body>
