@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, flash, session
+from flask import Flask, render_template, redirect, url_for, flash, session,request
 import cx_Oracle
 import pandas as pd
 from business_duration import businessDuration
@@ -110,10 +110,20 @@ defect_age_list = DurSLA[4]
 meet_sla_list = DurSLA[5]
 dfExport = DurSLA[6]
 
-@app.route("/")
+@app.route("/",methods=["POST","GET"])
 def mainTable():
+    pjName = sDate = eDate =''
     cur = connect.cursor()
-    cur.execute(sql)
+    if request.method=="POST":
+        pjName = request.form['pjName']
+        sDate = request.values['sDate']
+        eDate = request.values['eDate']
+        if pjName:
+            cur.execure(sql+" and project_name=%s",pjName)
+        elif sDate and eDate:
+            cur.execure(sql+" and ( (Start_Date between %s and %s) or (End_Date between %s and %s) )",(sDate,eDate,sDate,eDate))
+    else:
+        cur.execute(sql)
     rows = cur.fetchall()
     connect.commit()
     return render_template('tqcPage.html', datas=rows, new_durations=defect_new_list,fixed_new=defect_fixed_new_list,fixed_assigned=defect_fixed_assigned_list,test=defect_test_list,age=defect_age_list,meetsla=meet_sla_list)
