@@ -41,6 +41,8 @@
       crossorigin="anonymous"
     ></script>
     <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.25.3/moment.js"></script>
+
   </head>
   <body>
     <div style="margin-top: 15px; text-align: center;">
@@ -49,7 +51,7 @@
 
     <div style="float: left; margin-left: 25px;">
       <a href="/export" style="color: #d11141; text-decoration: underline;"
-        ><i class="fa fa-file-excel-o" style="font-size: 24px;"> </i> Export as
+        ><i class="fa fa-file-excel-o" style="font-size: 24px;"> </i> Export all data as
         CSV file</a
       >
     </div>
@@ -59,16 +61,20 @@
       {% endfor %}
     </div>
 
+<!-- filter by date -->
     <div class="oneline" style="float: right; margin-right: 40px;">
-      <label for="end">End date: </label>
-      <input class="date_range_filter date" type="text" id="datepicker_to" />
+      <label for="datefilterfrom">End date: </label>
+      <input type="date" class="form-control" id="datefilterto" data-date-split-input="true">
     </div>
     <div class="oneline" style="float: right; margin-right: 20px;">
-      <label for="start">Start date: </label>
-      <input class="date_range_filter date" type="text" id="datepicker_from" />
+      <label for="datefilterfrom">Start date: </label>
+      <input type="date" class="form-control" id="datefilterfrom" data-date-split-input="true">
     </div>
 
+
     <br /><br />
+  
+<!-- table -->
     <div style="margin: 10px 20px 10px 20px;">
       <table class="table table-fluid hover cell-border" id="myTable">
         <thead style="background-color: #d11141; color: #fffafa;">
@@ -143,23 +149,23 @@
               <div class="collapse" id="dur{{row.5}}">
                 <div class="card-body">
                   <b>Defect new duration:</b><br />
-                  {% if newdu != 0 %} {{'%0.4f'| format(newdu)}} hours {% endif
+                  {% if newdu != 0 %} {{'%0.2f'| format(newdu)}} hours {% endif
                   %} {% if newdu == 0 %} {{newdu}} hours {% endif %}
                   <br />
                   <b>Defect fixed new duration:</b><br />
-                  {% if fixednew != 0 %} {{'%0.4f'| format(fixednew)}} hours {%
+                  {% if fixednew != 0 %} {{'%0.2f'| format(fixednew)}} hours {%
                   endif %} {% if fixednew == 0 %} {{fixednew}} hours {% endif %}
                   <br />
                   <b>Defect fixed assigned duration:</b><br />
-                  {% if fixedass != 0 %} {{'%0.4f'| format(fixedass)}} hours {%
+                  {% if fixedass != 0 %} {{'%0.2f'| format(fixedass)}} hours {%
                   endif %} {% if fixedass == 0 %} {{fixedass}} hours {% endif %}
                   <br />
                   <b>Defect test duration:</b><br />
-                  {% if test != 0 %} {{'%0.4f'| format(test)}} hours {% endif %}
+                  {% if test != 0 %} {{'%0.2f'| format(test)}} hours {% endif %}
                   {% if test == 0 %} {{test}} hours {% endif %}
                   <br />
                   <b>Defect age duration:</b><br />
-                  {% if age != 0 %} {{'%0.4f'| format(age)}} hours {% endif %}
+                  {% if age != 0 %} {{'%0.2f'| format(age)}} hours {% endif %}
                   {% if age == 0 %} {{age}} hours {% endif %}
                 </div>
               </div>
@@ -178,90 +184,40 @@
         $("#myTable").DataTable({
           ordering: false,
         });
-/*
-        $("#datepicker_from")
-          .datepicker({
-            showOn: "button",
-            buttonImage: "images/calendar.gif",
-            buttonImageOnly: false,
-            onSelect: function (date) {
-              minDateFilter = new Date(date).getTime();
-              oTable.fnDraw();
-            },
-          })
-          .keyup(function () {
-            minDateFilter = new Date(this.value).getTime();
-            oTable.fnDraw();
-          });
-
-        $("#datepicker_to")
-          .datepicker({
-            showOn: "button",
-            buttonImage: "images/calendar.gif",
-            buttonImageOnly: false,
-            onSelect: function (date) {
-              maxDateFilter = new Date(date).getTime();
-              oTable.fnDraw();
-            },
-          })
-          .keyup(function () {
-            maxDateFilter = new Date(this.value).getTime();
-            oTable.fnDraw();
-          });*/
       });
-/*
-      minDateFilter = "";
-      maxDateFilter = "";
 
-      $.fn.dataTableExt.afnFiltering.push(function (
-        oSettings,
-        aData,
-        iDataIndex
-      ) {
-        if (typeof aData._date == "undefined") {
-          aData._date = new Date(aData[0]).getTime();
+      function filterRows() {
+        var from = $('#datefilterfrom').val();
+        var to = $('#datefilterto').val();
+
+        if (!from && !to) { // no value for from and to
+          return;
         }
 
-        if (minDateFilter && !isNaN(minDateFilter)) {
-          if (aData._date < minDateFilter) {
-            return false;
-          }
-        }
+        from = from || '1970-01-01'; // default from to a old date if it is not set
+        to = to || '2999-12-31';
 
-        if (maxDateFilter && !isNaN(maxDateFilter)) {
-          if (aData._date > maxDateFilter) {
-            return false;
-          }
-        }
+        alert("before = "+dateTo);
+        var dateFrom = moment(from);
+        var dateTo = moment(to);
+        alert("dateTo = "+dateTo);
 
-        return true;
-      });*/
-
-/*      function Start() {
-        sDate = document.getElementById("start").value;
-
-        table = document.getElementById("myTable");
-        tr = table.getElementsByTagName("tr");
-        for (i = 0; i < tr.length; i++) {
-          td = tr[i].getElementsByTagName("td")[4];
-          if (td) {
-            txtValue = td.textContent || td.innerText;
-            if (txtValue.toUpperCase().indexOf(filter) > -1) {
-              tr[i].style.display = "";
-            } else {
-              tr[i].style.display = "none";
-            }
-          }
-        }
+        $('#myTable tr').each(function(i, tr) {
+          var val = $(tr).find("td:nth-child(6)").text();
+          var dateVal = moment(val, "DD/MM/YYYY");
+          var visible = (dateVal.isBetween(dateFrom, dateTo, null, [])) ? "" : "none"; // [] for inclusive
+          $(tr).css('display', visible);
+        });
       }
 
-      function End() {
-        eDate = document.getElementById("end").value;
-      }*/
+      $('#datefilterfrom').on("change", filterRows);
+      $('#datefilterto').on("change", filterRows);
 
     </script>
+
   </body>
 </html>
+
 
 <style>
   body {

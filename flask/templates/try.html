@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script
+      src="http://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"
+    ></script>
+
+<!-- calendar -->
+    <link
+      data-require="jqueryui@*"
+      data-semver="1.10.0"
+      rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.0/css/smoothness/jquery-ui-1.10.0.custom.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+      integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"
+    />
+<!-- icon -->
+    <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+      integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+      integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      data-require="jqueryui@*"
+      data-semver="1.10.0"
+      src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.0/jquery-ui.js"
+    ></script>
+    <script
+      src="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/jquery.dataTables.js"
+      data-semver="1.9.4"
+      data-require="datatables@*"
+    ></script>
+    <script src="script.js"></script>
+  </head>
+
+  <body>
+<p id="date_filter">
+    <span id="date-label-from" class="date-label">From: </span><input class="date_range_filter date" type="text" id="datepicker_from" />
+    <span id="date-label-to" class="date-label">To:<input class="date_range_filter date" type="text" id="datepicker_to" />
+</p>
+    <table width="100%" class="display" id="datatable">
+      <thead>
+        <tr>
+          <th>Col1</th>
+          <th>Col2</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            03/03/2016
+          </td>
+          <td>5</td>
+        </tr>
+        <tr>
+          <td>
+            03/04/2017
+          </td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <td>
+             03/05/2017
+          </td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <td>
+            03/06/2016
+          </td>
+          <td>17</td>
+        </tr>
+        <tr>
+          <td>
+            03/07/2017
+          </td>
+          <td>10</td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+
+</html>
