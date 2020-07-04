@@ -112,21 +112,27 @@ dfExport = DurSLA[6]
 
 @app.route("/",methods=["POST","GET"])
 def mainTable():
-    pjName = sDate = eDate =''
+    pjName = sDate =sToDate = ''
     cur = connect.cursor()
     if request.method=="POST":
         pjName = request.form['pjName']
-        sDate = request.values['start']
-        eDate = request.values['end']
+        sDate = request.form['start']
+        eDate = str(request.values['end'])
         if pjName:
             cur.execute(sql+ " and project_name =:0",(pjName,))
-        elif sDate and eDate:
-            cur.execute(sql+" and ( (Start_Date between %s and %s) or (End_Date between %s and %s) )",(sDate,eDate,sDate,eDate))
+#search similar
+#            pjNameLike = '%'+pjName+'%'
+#            cur.execute(sql+ " and project_name LIKE :0",(pjNameLike,))
+        elif sDate:
+            sToDate = "TO_DATE('"+sDate+"','yyyy-mm-dd')"
+            eToDate = "TO_DATE('"+eDate+"','yyyy-mm-dd')"
+        #    cur.execute(sql)
+            cur.execute(sql+" and ( (Start_Date BETWEEN "+sToDate+" AND "+eToDate+" ) OR (End_Date BETWEEN "+sToDate+" AND "+eToDate+" ) )")
     else:
         cur.execute(sql)
     rows = cur.fetchall()
     connect.commit()
-    return render_template('tqcPage.html', datas=rows, new_durations=defect_new_list,fixed_new=defect_fixed_new_list,fixed_assigned=defect_fixed_assigned_list,test=defect_test_list,age=defect_age_list,meetsla=meet_sla_list)
+    return render_template('tqcPage.html', sDate=sToDate, datas=rows, new_durations=defect_new_list,fixed_new=defect_fixed_new_list,fixed_assigned=defect_fixed_assigned_list,test=defect_test_list,age=defect_age_list,meetsla=meet_sla_list)
 
 @app.route("/export")
 def export():
