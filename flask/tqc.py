@@ -116,12 +116,12 @@ def mainTable():
     cur = connect.cursor()
     if request.method=="POST":
         pjName = request.form['pjName']
-        sDate = request.values['sDate']
-        eDate = request.values['eDate']
+        sDate = request.values['start']
+        eDate = request.values['end']
         if pjName:
-            cur.execure(sql+" and project_name=%s",pjName)
+            cur.execute(sql+ " and project_name =:0",(pjName,))
         elif sDate and eDate:
-            cur.execure(sql+" and ( (Start_Date between %s and %s) or (End_Date between %s and %s) )",(sDate,eDate,sDate,eDate))
+            cur.execute(sql+" and ( (Start_Date between %s and %s) or (End_Date between %s and %s) )",(sDate,eDate,sDate,eDate))
     else:
         cur.execute(sql)
     rows = cur.fetchall()
