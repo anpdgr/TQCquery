@@ -13,8 +13,7 @@ app.secret_key = "super secret key"
 
 dsn_string = """(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=172.19.195.170)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=TQCPRD)))"""
 try:
-    connect = cx_Oracle.connect(
-        user="QAQCAPPO", password="QAQCAPPO#123", dsn=dsn_string, encoding="UTF-8")
+    connect = cx_Oracle.connect(user="QAQCAPPO", password="QAQCAPPO#123", dsn=dsn_string, encoding="UTF-8")
 except:
     print("connect failed")
 
@@ -98,10 +97,8 @@ order by project.project_id, defect.defect_run_id , sub_defect.SUB_RUN_ID
 where  row_num=1 and rownum <= 30
 """
 
-SQL_Query = pd.read_sql_query(sql,connect)
-df = pd.DataFrame(SQL_Query)
-
-DurSLA = TQC_report_v5.tqcCalculate(connect,df)
+#completed
+DurSLA = TQC_report_v5.tqcCalculate(sql,connect)
 defect_new_list = DurSLA[0]
 defect_fixed_new_list = DurSLA[1]
 defect_fixed_assigned_list = DurSLA[2]
@@ -110,35 +107,100 @@ defect_age_list = DurSLA[4]
 meet_sla_list = DurSLA[5]
 dfExport = DurSLA[6]
 
-@app.route("/",methods=["POST","GET"])
+#completed
+@app.route("/")
 def mainTable():
-    pjName = sDate =sToDate = ''
     cur = connect.cursor()
-    if request.method=="POST":
-        pjName = request.form['pjName']
-        sDate = request.form['start']
-        eDate = str(request.values['end'])
-        if pjName:
-            cur.execute(sql+ " and project_name =:0",(pjName,))
-#search similar
-#            pjNameLike = '%'+pjName+'%'
-#            cur.execute(sql+ " and project_name LIKE :0",(pjNameLike,))
-        elif sDate:
-            sToDate = "TO_DATE('"+sDate+"','yyyy-mm-dd')"
-            eToDate = "TO_DATE('"+eDate+"','yyyy-mm-dd')"
-        #    cur.execute(sql)
-            cur.execute(sql+" and ( (Start_Date BETWEEN "+sToDate+" AND "+eToDate+" ) OR (End_Date BETWEEN "+sToDate+" AND "+eToDate+" ) )")
-    else:
-        cur.execute(sql)
+    cur.execute(sql)
     rows = cur.fetchall()
     connect.commit()
-    return render_template('tqcPage.html', sDate=sToDate, datas=rows, new_durations=defect_new_list,fixed_new=defect_fixed_new_list,fixed_assigned=defect_fixed_assigned_list,test=defect_test_list,age=defect_age_list,meetsla=meet_sla_list)
+    return render_template('tqcPage.html', datas=rows, new_durations=defect_new_list,fixed_new=defect_fixed_new_list,fixed_assigned=defect_fixed_assigned_list,test=defect_test_list,age=defect_age_list,meetsla=meet_sla_list)
 
-@app.route("/export")
+#completed
+@app.route("/exportall")
 def export():
     filename = "TQC_query_results_"+str(datetime.now().strftime("%Y-%m-%d %H%M%S"))+".csv"
     dfExport.to_csv(filename,index=False,header=True,encoding='utf-8-sig')
     flash("Exported as "+filename)
+    return redirect(url_for('mainTable'))
+
+#completed
+@app.route("/filter",methods=["POST","GET"])
+def filteredTable():
+    pjName = sDate = eDate = ''
+    cur = connect.cursor()
+    if request.method=="POST":
+        pjName = request.form['pjName']
+        sDate = request.form['start']
+        eDate = request.form['end']
+        if pjName:
+            sDate = eDate = ''
+            pjSQL = sql+ " and project_name ='"+pjName+"'"
+            pjList = TQC_report_v5.tqcCalculate(pjSQL,connect)
+            defect_new_list = pjList[0]
+            defect_fixed_new_list = pjList[1]
+            defect_fixed_assigned_list = pjList[2]
+            defect_test_list = pjList[3]
+            defect_age_list = pjList[4]
+            meet_sla_list = pjList[5]
+            cur.execute(pjSQL)
+            #search similar
+            #            pjNameLike = '%'+pjName+'%'
+            #            cur.execute(sql+ " and project_name LIKE :0",(pjNameLike,))
+        elif sDate and eDate:
+            pjName =''
+            sToDate = "TO_DATE('"+sDate+"','yyyy-mm-dd')"
+            eToDate = "TO_DATE('"+eDate+"','yyyy-mm-dd')"
+            dateSQL = sql+" and ( (Start_Date BETWEEN "+sToDate+" AND "+eToDate+" ) OR (End_Date BETWEEN "+sToDate+" AND "+eToDate+" ) )"
+            dateList = TQC_report_v5.tqcCalculate(dateSQL,connect)
+            defect_new_list = dateList[0]
+            defect_fixed_new_list = dateList[1]
+            defect_fixed_assigned_list = dateList[2]
+            defect_test_list = dateList[3]
+            defect_age_list = dateList[4]
+            meet_sla_list = dateList[5]
+            cur.execute(dateSQL)
+    rows = cur.fetchall()
+    connect.commit()
+    return render_template('tqcPage.html', datas=rows, new_durations=defect_new_list,fixed_new=defect_fixed_new_list,fixed_assigned=defect_fixed_assigned_list,test=defect_test_list,age=defect_age_list,meetsla=meet_sla_list,pjName=pjName,sDate=sDate,eDate=eDate)
+
+
+@app.route("/exportsome/<string:pjName>",methods=["GET"])
+def exportsomePj(pjName):
+    filename = "TQC_query_results_"+str(datetime.now().strftime("%Y-%m-%d %H%M%S"))+".csv"
+    #pjName = sDate = eDate = ''
+        #pjName = request.form['pjName']
+    #sDate = request.form['start']
+    #eDate = request.form['end']
+    if pjName:
+        pjSQL = sql+ " and project_name ='"+pjName+"'"
+        pjList = TQC_report_v5.tqcCalculate(pjSQL,connect)
+        pjExport = pjList[6]
+        pjExport.to_csv(filename,index=False,header=True,encoding='utf-8-sig')
+    else:
+        DurSLA = TQC_report_v5.tqcCalculate(sql,connect)
+        dfExport = DurSLA[6]
+        dfExport.to_csv(filename,index=False,header=True,encoding='utf-8-sig')
+    flash("Exported as "+filename+pjName)
+    return redirect(url_for('mainTable'))
+
+@app.route("/exportsome/<string:sDate>/<string:eDate>",methods=["GET"])
+def exportsomeDate(sDate,eDate):
+    filename = "TQC_query_results_"+str(datetime.now().strftime("%Y-%m-%d %H%M%S"))+".csv"
+    #sDate = request.form['start']
+    #eDate = request.form['end']
+    if sDate and eDate:
+        sToDate = "TO_DATE('"+sDate+"','yyyy-mm-dd')"
+        eToDate = "TO_DATE('"+eDate+"','yyyy-mm-dd')"
+        dateSQL = sql+" and ( (Start_Date BETWEEN "+sToDate+" AND "+eToDate+" ) OR (End_Date BETWEEN "+sToDate+" AND "+eToDate+" ) )"
+        dateList = TQC_report_v5.tqcCalculate(dateSQL,connect)
+        dateExport = dateList[6]
+        dateExport.to_csv(filename,index=False,header=True,encoding='utf-8-sig')
+    else:
+        DurSLA = TQC_report_v5.tqcCalculate(sql,connect)
+        dfExport = DurSLA[6]
+        dfExport.to_csv(filename,index=False,header=True,encoding='utf-8-sig')
+    flash("Exported as "+filename+sDate+eDate)
     return redirect(url_for('mainTable'))
 
 

@@ -1,4 +1,5 @@
-def tqcCalculate(connect,df):
+def tqcCalculate(sql,connect):
+
     import cx_Oracle
     import pandas as pd
     from business_duration import businessDuration
@@ -55,6 +56,9 @@ def tqcCalculate(connect,df):
         date(2020,12,7):"ชดเชยวันพ่อ",
         date(2020,12,31):"สิ้นปี"
     }
+
+    SQL_Query = pd.read_sql_query(sql,connect)
+    df = pd.DataFrame(SQL_Query)
 
     # defect_log
     sql_defect_log = pd.read_sql_query("""select Defect_ID,SUB_ID,New_Value,LAST_MODIFIED from defect_log where field_id=10017""",connect)
