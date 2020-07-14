@@ -33,7 +33,7 @@ from business_duration import businessDuration
 import holidays as pyholidays
 from datetime import time,date,datetime
 import math
-import sla
+import './flask/sla'
 
 
 #Business open hour must be in standard python time format-Hour,Min,Sec
@@ -171,11 +171,12 @@ LEFT OUTER JOIN defect_log defect_log_ready ON (defect_log_ready.defect_id = def
 LEFT OUTER JOIN defect_log defect_log_closed ON (defect_log_closed.defect_id = defect.defect_id) and (defect_log_closed.sub_id = sub_defect.sub_run_id) AND (defect_log_closed.new_value = 'Closed')
 order by project.project_id, defect.defect_run_id , sub_defect.SUB_RUN_ID
 ) 
-where  row_num=1 
+where  row_num=1 and rownum <= 30
 """
 
 SQL_Query = pd.read_sql_query(sql,connect)
 df = pd.DataFrame(SQL_Query)
+print(df)
 # print(df)
 
 # defect_log
@@ -252,10 +253,9 @@ for index, row in df.iterrows():
     if closed_date == '':
         closed_date = datetime.now()
 
+
+
     # calculate new duration
-
-
-
     defect_new_duration = 0
     if new_date != '' and assigned_date != '':
         if current_project_name.startswith('CPC'):
@@ -271,6 +271,7 @@ for index, row in df.iterrows():
             # print("assigned_date: {}\n".format(assigned_date))
     defect_new_list.append(defect_new_duration)
 
+
     # calculate fixed days ( detected_date -> ready_to_test_date )
     defect_fixed_new_duration = 0
     # ในกรณีที่ยังมีวัน ready to test  ให้เอาวันที่ปัจจุบันแทน
@@ -283,12 +284,11 @@ for index, row in df.iterrows():
             defect_fixed_new_duration = businessDuration(startdate=new_date,enddate=ready_to_test_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
         if math.isnan(defect_fixed_new_duration):
             defect_fixed_new_duration = 0
-
     defect_fixed_new_list.append(defect_fixed_new_duration)
+
 
     # calculate test days ( ready_to_test_date -> closed_date )
     defect_test_duration = 0
-
     if ready_to_test_date != '' and closed_date != '':
         
         if current_project_name.startswith('CPC'):
@@ -299,6 +299,7 @@ for index, row in df.iterrows():
         if math.isnan(defect_test_duration):
             defect_test_duration = 0
     defect_test_list.append(defect_test_duration)
+
 
     # calculate age days ( detected_date -> closed_date)
     defect_age_duration = 0
@@ -322,6 +323,8 @@ for index, row in df.iterrows():
         if math.isnan(defect_fixed_assigned_duration):
             defect_fixed_assigned_duration = 0
     defect_fixed_assigned_list.append(defect_fixed_assigned_duration)
+
+
 
     # calculate SLA
     if current_project_name.startswith('CPC'):
@@ -401,7 +404,7 @@ df['DFECCT_REASSIGNED10_DURATION'] = defect_reassigned_list10
 
 
 #  3. Save to file
-df.to_csv("TQC_query_results_"+str(datetime.now().strftime("%Y-%m-%d %H%M%S"))+".csv",index=False,header=True,encoding='utf-8-sig')
+#df.to_csv("TQC_query_results_"+str(datetime.now().strftime("%Y-%m-%d %H%M%S"))+".csv",index=False,header=True,encoding='utf-8-sig')
 
 
 
