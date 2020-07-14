@@ -208,6 +208,7 @@ for index, row in df.iterrows():
     current_severity_name = row['SEVERITY_NAME']
     current_priority_name = row['PRIORITY_NAME']
     current_project_name = row['PROJECT_NAME']
+    current_detected_date = row['DETECTED_DATE']
     # current_defect_id = 2778
     # current_sub_defect_no = 1
     # print(current_defect_id) 
@@ -241,6 +242,11 @@ for index, row in df.iterrows():
             closed_date = pd.to_datetime(row['LAST_MODIFIED'],dayfirst=True)
         if row['NEW_VALUE'] == 'Re-New': # ถ้ามีการ renew ให้วันที่เริ่มต้นเจอ defect ป็น renew date แทน`
             new_date = pd.to_datetime(row['LAST_MODIFIED'],dayfirst=True) 
+    
+    # if no new_date, then use detected date instead
+    if new_date == '':
+        new_date = current_detected_date
+        print(new_date)
 
     # if no closed_date, then it's now.
     if closed_date == '':
