@@ -127,7 +127,7 @@ def export():
 #completed
 @app.route("/filter",methods=["POST","GET"])
 def filteredTable():
-    pjName = sDate = eDate = ''
+    pjName = sDate = eDate = checkTab = ''
     cur = connect.cursor()
     if request.method=="POST":
         pjName = request.form['pjName']
@@ -147,6 +147,7 @@ def filteredTable():
             #search similar
             #            pjNameLike = '%'+pjName+'%'
             #            cur.execute(sql+ " and project_name LIKE :0",(pjNameLike,))
+            checkTab = 'pj'
         elif sDate and eDate:
             pjName =''
             sToDate = "TO_DATE('"+sDate+"','yyyy-mm-dd')"
@@ -160,9 +161,10 @@ def filteredTable():
             defect_age_list = dateList[4]
             meet_sla_list = dateList[5]
             cur.execute(dateSQL)
+            checkTab = 'date'
     rows = cur.fetchall()
     connect.commit()
-    return render_template('tqcPage.html', datas=rows, new_durations=defect_new_list,fixed_new=defect_fixed_new_list,fixed_assigned=defect_fixed_assigned_list,test=defect_test_list,age=defect_age_list,meetsla=meet_sla_list,pjName=pjName,sDate=sDate,eDate=eDate)
+    return render_template('tqcPage.html', datas=rows, new_durations=defect_new_list,fixed_new=defect_fixed_new_list,fixed_assigned=defect_fixed_assigned_list,test=defect_test_list,age=defect_age_list,meetsla=meet_sla_list,pjName=pjName,sDate=sDate,eDate=eDate,checkTab=checkTab)
 
 
 @app.route("/exportsome/<string:pjName>",methods=["GET"])
@@ -200,7 +202,7 @@ def exportsomeDate(sDate,eDate):
         DurSLA = TQC_report_v5.tqcCalculate(sql,connect)
         dfExport = DurSLA[6]
         dfExport.to_csv(filename,index=False,header=True,encoding='utf-8-sig')
-    flash("Exported as "+filename+sDate+eDate)
+    flash("Exported as "+filename)
     return redirect(url_for('mainTable'))
 
 

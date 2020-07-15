@@ -80,7 +80,11 @@
       >
         <li class="nav-item">
           <a
-            class="btn nav-link active"
+            {% if checkTab == 'pj' or checkTab == None %}
+              class="btn nav-link active"
+            {% else %}
+              class="btn nav-link"
+            {% endif %}
             data-toggle="pill"
             href="#searchProject"
             style="background-color:#d11141;"
@@ -88,7 +92,15 @@
           >
         </li>
         <li class="nav-item" style="margin-left: 5px;">
-          <a class="btn btn-danger nav-link" data-toggle="pill" href="#searchDate"
+          <a 
+            {% if checkTab == 'date' %}
+              class="btn nav-link active"
+            {% else %}
+              class="btn nav-link"
+            {% endif %}
+            data-toggle="pill"
+            href="#searchDate"
+            style="background-color:#d11141;"
             >Search by <b>Start/End Date</b></a
           >
         </li>
@@ -96,7 +108,14 @@
 <br><br>
       <!-- Tab panes -->
       <div class="tab-content">
-        <div id="searchProject" class="container tab-pane active">
+        <div 
+          id="searchProject"
+          {% if checkTab == 'pj' or checkTab == None %}
+            class="container tab-pane active"
+          {% else %}
+            class="container tab-pane fade" 
+          {% endif %}
+        >
           <br />
           <form action="/filter" method="post">
             <div class="row" style="float: right; min-width: 500px;">
@@ -120,6 +139,7 @@
                 id="pjName"
                 name="pjName"
                 value="{{pjName}}"
+                required
               />
               <div class="col" style="padding-right:0px;" >
                 <button class="btn btn-outline-danger" type="submit" style="float:right; margin-right: 10px;">
@@ -129,12 +149,24 @@
             </div>
           </form>
           <br><br>
-          <a href="/exportsome/{{pjName}}" style="color: #d11141; text-decoration: underline; float: right;"
-          ><i class="fa fa-file-excel-o" style="font-size: 24px;"> </i> Export <b>filtered
-          data</b> (by Project name)</a
-        >
+          <a href="/" style="color: #d11141; float:right;"
+            >Clear filter
+          </a>
+          <a href="/exportsome/{{pjName}}" style="color: #d11141; text-decoration: underline; float: right; margin-right: 50px;"
+            ><i class="fa fa-file-excel-o" style="font-size: 24px;"> </i> Export <b>filtered
+            data</b> (by Project name)
+          </a>
         </div>
-        <div id="searchDate" class="container tab-pane fade" style="width: auto;">
+
+        <div 
+          id="searchDate" 
+          {% if checkTab == 'date' %}
+            class="container tab-pane active"
+          {% else %}
+            class="container tab-pane fade" 
+          {% endif %}
+          style="width: auto;"
+        >
           <br />
           <form action="/filter" method="post">
             <div class="row">
@@ -145,9 +177,10 @@
                 id="start"
                 name="start"
                 value="{{sDate}}"
+                required
               /><pre> &nbsp; &nbsp;</pre>
               <label>End Date : &nbsp;</label>
-              <input class="form-control col" type="date" id="end" name="end" value="{{eDate}}"/>
+              <input class="form-control col" type="date" id="end" name="end" value="{{eDate}}" required/>
               <input
                 class="form-control col"
                 type="hidden"
@@ -162,11 +195,15 @@
               </div>
             </div>
           </form>
-          <a href="/exportsome/{{sDate}}/{{eDate}}" style="color: #d11141; text-decoration: underline; float: right; margin-top: 10px;"
-          ><i class="fa fa-file-excel-o" style="font-size: 24px;"> </i> Export <b>filtered
-          data </b> (by Date)</a
-        >
+          <a href="/" style="color: #d11141; float:right;  margin-top: 10px; "
+            >Clear filter
+          </a>
+          <a href="/exportsome/{{sDate}}/{{eDate}}" style="color: #d11141; text-decoration: underline; float: right; margin-top: 10px;  margin-right: 50px;"
+            ><i class="fa fa-file-excel-o" style="font-size: 24px;"> </i> Export <b>filtered
+            data </b> (by Date)
+          </a>
         </div>
+
       </div>
     </div>
     <!-- table -->
