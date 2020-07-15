@@ -1,5 +1,5 @@
-from flask import Flask, render_template, redirect, url_for, flash, session,request
-import cx_Oracle
+from flask import send_file, Flask, render_template, redirect, url_for, flash, session,request
+import cx_Oracle,os
 import pandas as pd
 from business_duration import businessDuration
 import holidays as pyholidays
@@ -116,7 +116,7 @@ def mainTable():
     connect.commit()
     return render_template('tqcPage.html', datas=rows, new_durations=defect_new_list,fixed_new=defect_fixed_new_list,fixed_assigned=defect_fixed_assigned_list,test=defect_test_list,age=defect_age_list,meetsla=meet_sla_list)
 
-#completed
+
 @app.route("/exportall")
 def export():
     filename = "TQC_query_results_"+str(datetime.now().strftime("%Y-%m-%d %H%M%S"))+".csv"
@@ -166,43 +166,37 @@ def filteredTable():
     connect.commit()
     return render_template('tqcPage.html', datas=rows, new_durations=defect_new_list,fixed_new=defect_fixed_new_list,fixed_assigned=defect_fixed_assigned_list,test=defect_test_list,age=defect_age_list,meetsla=meet_sla_list,pjName=pjName,sDate=sDate,eDate=eDate,checkTab=checkTab)
 
+"""@app.route('/download')
+def downloadFile():
+    path = "flask/exportedFile/ TQC_query_results_2020-07-15 162925.csv"
+    return send_file(path,as_attachment=True)"""
 
 @app.route("/exportsome/<string:pjName>",methods=["GET"])
 def exportsomePj(pjName):
     filename = "TQC_query_results_"+str(datetime.now().strftime("%Y-%m-%d %H%M%S"))+".csv"
-    #pjName = sDate = eDate = ''
-        #pjName = request.form['pjName']
-    #sDate = request.form['start']
-    #eDate = request.form['end']
     if pjName:
         pjSQL = sql+ " and project_name ='"+pjName+"'"
         pjList = TQC_report_v5.tqcCalculate(pjSQL,connect)
         pjExport = pjList[6]
-        pjExport.to_csv(filename,index=False,header=True,encoding='utf-8-sig')
-    else:
-        DurSLA = TQC_report_v5.tqcCalculate(sql,connect)
-        dfExport = DurSLA[6]
-        dfExport.to_csv(filename,index=False,header=True,encoding='utf-8-sig')
-    flash("Exported as "+filename+pjName)
+        pjExport.to_csv(r"flask\exportedFile\ "+filename,index=False,header=True,encoding='utf-8-sig')
+        flash("Exported as "+filename)
+        path = r"exportedFile\ "+filename
+        return send_file(path,as_attachment=True)
     return redirect(url_for('mainTable'))
 
 @app.route("/exportsome/<string:sDate>/<string:eDate>",methods=["GET"])
 def exportsomeDate(sDate,eDate):
     filename = "TQC_query_results_"+str(datetime.now().strftime("%Y-%m-%d %H%M%S"))+".csv"
-    #sDate = request.form['start']
-    #eDate = request.form['end']
     if sDate and eDate:
         sToDate = "TO_DATE('"+sDate+"','yyyy-mm-dd')"
         eToDate = "TO_DATE('"+eDate+"','yyyy-mm-dd')"
         dateSQL = sql+" and ( (Start_Date BETWEEN "+sToDate+" AND "+eToDate+" ) OR (End_Date BETWEEN "+sToDate+" AND "+eToDate+" ) )"
         dateList = TQC_report_v5.tqcCalculate(dateSQL,connect)
         dateExport = dateList[6]
-        dateExport.to_csv(filename,index=False,header=True,encoding='utf-8-sig')
-    else:
-        DurSLA = TQC_report_v5.tqcCalculate(sql,connect)
-        dfExport = DurSLA[6]
-        dfExport.to_csv(filename,index=False,header=True,encoding='utf-8-sig')
-    flash("Exported as "+filename)
+        dateExport.to_csv(r"flask\exportedFile\ "+filename,index=False,header=True,encoding='utf-8-sig')
+        flash("Exported as "+filename)
+        path = r"exportedFile\ "+filename
+        return send_file(path,as_attachment=True)
     return redirect(url_for('mainTable'))
 
 

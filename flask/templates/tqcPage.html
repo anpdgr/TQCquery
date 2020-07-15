@@ -152,10 +152,21 @@
           <a href="/" style="color: #d11141; float:right;"
             >Clear filter
           </a>
-          <a href="/exportsome/{{pjName}}" style="color: #d11141; text-decoration: underline; float: right; margin-right: 50px;"
+          <a 
+            {% if pjName %}
+              href="/exportsome/{{pjName}}" 
+            {% else %}
+              href="/exportall"
+            {% endif %}
+            style="color: #d11141; text-decoration: underline; float: right; margin-right: 50px;"
             ><i class="fa fa-file-excel-o" style="font-size: 24px;"> </i> Export <b>filtered
             data</b> (by Project name)
           </a>
+
+          <!-- <a href="/download" style="color: #d11141; text-decoration: underline; float: right; margin-right: 50px;"
+            ><i class="fa fa-file-excel-o" style="font-size: 24px;"> </i> Export
+          </a> -->
+
         </div>
 
         <div 
@@ -198,7 +209,13 @@
           <a href="/" style="color: #d11141; float:right;  margin-top: 10px; "
             >Clear filter
           </a>
-          <a href="/exportsome/{{sDate}}/{{eDate}}" style="color: #d11141; text-decoration: underline; float: right; margin-top: 10px;  margin-right: 50px;"
+          <a 
+            {% if sDate and eDate %}
+              href="/exportsome/{{sDate}}/{{eDate}}" 
+            {% else %}
+              href="/exportall"
+            {% endif %}
+            style="color: #d11141; text-decoration: underline; float: right; margin-top: 10px;  margin-right: 50px;"
             ><i class="fa fa-file-excel-o" style="font-size: 24px;"> </i> Export <b>filtered
             data </b> (by Date)
           </a>
