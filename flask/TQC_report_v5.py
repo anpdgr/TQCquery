@@ -89,6 +89,8 @@ def tqcCalculate(sql,connect):
         current_main_defect_status = row['MAIN_DEFECT_STATUS']
         current_severity_name = row['SEVERITY_NAME']
         current_priority_name = row['PRIORITY_NAME']
+        current_project_name = row['PROJECT_NAME']
+        current_detected_date = row['DETECTED_DATE']
         # current_defect_id = 2778
         # current_sub_defect_no = 1
         # print(current_defect_id) 
@@ -123,6 +125,10 @@ def tqcCalculate(sql,connect):
             if row['NEW_VALUE'] == 'Re-New': # ถ้ามีการ renew ให้วันที่เริ่มต้นเจอ defect ป็น renew date แทน`
                 new_date = pd.to_datetime(row['LAST_MODIFIED'],dayfirst=True) 
 
+        # if no new_date, then use detected date instead
+        if new_date == '':
+            new_date = current_detected_date
+
         # if no closed_date, then it's now.
         if closed_date == '':
             closed_date = datetime.now()
@@ -130,7 +136,11 @@ def tqcCalculate(sql,connect):
         # calculate new duration
         defect_new_duration = 0
         if new_date != '' and assigned_date != '':
-            defect_new_duration = businessDuration(startdate=new_date,enddate=assigned_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
+            if current_project_name.startswith('CPC'):
+                defect_new_duration = businessDuration(startdate=new_date,enddate=assigned_date,weekendlist=[],unit=unit_hour)
+            else:
+                defect_new_duration = businessDuration(startdate=new_date,enddate=assigned_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
+            
             #print("defect_new_duration: {}".format(defect_new_duration))
             if math.isnan(defect_new_duration):
                 defect_new_duration = 0
@@ -139,32 +149,43 @@ def tqcCalculate(sql,connect):
                 # print("assigned_date: {}\n".format(assigned_date))
         defect_new_list.append(defect_new_duration)
 
+
         # calculate fixed days ( detected_date -> ready_to_test_date )
         defect_fixed_new_duration = 0
         # ในกรณีที่ยังมีวัน ready to test  ให้เอาวันที่ปัจจุบันแทน
         if ready_to_test_date == '':
             ready_to_test_date = datetime.now()
         if new_date != '' and ready_to_test_date != '':
-            defect_fixed_new_duration = businessDuration(startdate=new_date,enddate=ready_to_test_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
+            if current_project_name.startswith('CPC'):
+                defect_fixed_new_duration = businessDuration(startdate=new_date,enddate=ready_to_test_date,weekendlist=[],unit=unit_hour)
+            else:
+                defect_fixed_new_duration = businessDuration(startdate=new_date,enddate=ready_to_test_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
             if math.isnan(defect_fixed_new_duration):
                 defect_fixed_new_duration = 0
-
         defect_fixed_new_list.append(defect_fixed_new_duration)
+
 
         # calculate test days ( ready_to_test_date -> closed_date )
         defect_test_duration = 0
-
         if ready_to_test_date != '' and closed_date != '':
-            defect_test_duration = businessDuration(startdate=ready_to_test_date,enddate    =closed_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
+            
+            if current_project_name.startswith('CPC'):
+                defect_test_duration = businessDuration(startdate=ready_to_test_date,enddate=closed_date,weekendlist=[],unit=unit_hour)
+            else:
+                defect_test_duration = businessDuration(startdate=ready_to_test_date,enddate=closed_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
             
             if math.isnan(defect_test_duration):
                 defect_test_duration = 0
         defect_test_list.append(defect_test_duration)
 
+
         # calculate age days ( detected_date -> closed_date)
         defect_age_duration = 0
         if new_date != '' and closed_date != '':
-            defect_age_duration =  businessDuration(startdate=new_date,enddate=closed_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
+            if current_project_name.startswith('CPC'):
+                defect_age_duration =  businessDuration(startdate=new_date,enddate=closed_date,weekendlist=[],unit=unit_hour)
+            else:
+                defect_age_duration =  businessDuration(startdate=new_date,enddate=closed_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
             if math.isnan(defect_age_duration):
                 defect_age_duration = 0
         defect_age_list.append(defect_age_duration)
@@ -172,29 +193,23 @@ def tqcCalculate(sql,connect):
         # ( assigned_date -> ready_to_test_date ) 
         defect_fixed_assigned_duration = 0
         if assigned_date != '' and ready_to_test_date != '':
-            defect_fixed_assigned_duration = businessDuration(startdate=assigned_date,enddate=ready_to_test_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
+            if current_project_name.startswith('CPC'):
+                defect_fixed_assigned_duration = businessDuration(startdate=assigned_date,enddate=ready_to_test_date,weekendlist=[],unit=unit_hour)
+            else:
+                defect_fixed_assigned_duration = businessDuration(startdate=assigned_date,enddate=ready_to_test_date,starttime=biz_open_time,endtime=biz_close_time,holidaylist=Thai_holiday_list,unit=unit_hour)
+            
             if math.isnan(defect_fixed_assigned_duration):
                 defect_fixed_assigned_duration = 0
         defect_fixed_assigned_list.append(defect_fixed_assigned_duration)
 
-        # calculate SLA
-        sla_status = ''
-        if (current_severity_name == None):
-            current_severity_name = current_priority_name
 
-        if (current_severity_name == 'Low' or current_severity_name == None ):
-            sla_status = 'Low'
-        elif (current_main_defect_status == 'Cancelled'):
-            sla_status = 'Cancelled'
-        elif (current_severity_name == 'Critical' and defect_fixed_new_duration > 4):
-            sla_status = 'N'
-        elif (current_severity_name == 'High' and defect_fixed_new_duration > 8):
-            sla_status = 'N'
-        elif (current_severity_name == 'Medium' and defect_fixed_new_duration > 16):
-            sla_status = 'N'
+
+        # calculate SLA
+        if current_project_name.startswith('CPC'):
+            sla_status = calculate_sla(project_group='CPC',severity_name=current_severity_name,priority_name=current_priority_name,defect_status=current_main_defect_status,defect_fixed_new_duration=defect_fixed_new_duration)
         else:
-            #print("severity: {}".format(current_severity_name)) 
-            sla_status = 'Y'
+            sla_status = calculate_sla(severity_name=current_severity_name,priority_name=current_priority_name,defect_status=current_main_defect_status,defect_fixed_new_duration=defect_fixed_new_duration)
+        
 
         meet_sla_list.append(sla_status)
         # if (defect_age_duration > 0 and defect_age_duration <= 4):
@@ -250,3 +265,58 @@ def tqcCalculate(sql,connect):
     Dur_SLA.extend([defect_new_list, defect_fixed_new_list, defect_fixed_assigned_list, defect_test_list, defect_age_list, meet_sla_list,df])
 
     return Dur_SLA
+
+
+
+
+
+def calculate_sla(severity_name,priority_name,defect_status,defect_fixed_new_duration,project_group=""):
+    """calculate the SLA and check whether it meet SLA criteria or not
+
+    Parameters
+    ----------
+    project_group : str
+        The specific project group (default is blank).
+    severity_name : str
+        The severity name (Critical,High,Medium).
+    priority_name : str
+        The priority name will be used if the severity name is none.
+    defect_status : str
+        The defect status (Open,Fixed,Closed,Cancelled)
+    defect_fixed_new_duration : int
+        The defect duration from new status to fixed status
+
+    Returns
+    -------
+    str
+        Status: Y or N
+
+    """
+    sla_status = ''
+    critical_point = 4      # default value of critical point
+    high_point = 8          # default value of high point
+    medium_point = 16       # default value of medium point
+
+    # specific value for CPC project group
+    if (project_group == 'CPC'):   
+        critical_point = 24
+        high_point = 48
+        medium_point = 120
+
+    if (severity_name == None):
+        severity_name = priority_name
+
+    if (defect_status == 'Cancelled'):
+        sla_status = 'Cancelled'
+    elif (severity_name == 'Low' or severity_name == None ):
+        sla_status = 'Low'
+    elif (severity_name == 'Critical' and defect_fixed_new_duration > critical_point):
+        sla_status = 'N'
+    elif (severity_name == 'High' and defect_fixed_new_duration > high_point):
+        sla_status = 'N'
+    elif (severity_name == 'Medium' and defect_fixed_new_duration > medium_point):
+        sla_status = 'N'
+    else:
+        #print("severity: {}".format(severity_name)) 
+        sla_status = 'Y'
+    return sla_status

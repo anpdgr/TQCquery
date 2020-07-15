@@ -34,10 +34,10 @@ def calculate_sla(severity_name,priority_name,defect_status,defect_fixed_new_dur
     if (severity_name == None):
         severity_name = priority_name
 
-    if (severity_name == 'Low' or severity_name == None ):
-        sla_status = 'Low'
-    elif (defect_status == 'Cancelled'):
+    if (defect_status == 'Cancelled'):
         sla_status = 'Cancelled'
+    elif (severity_name == 'Low' or severity_name == None ):
+        sla_status = 'Low'
     elif (severity_name == 'Critical' and defect_fixed_new_duration > critical_point):
         sla_status = 'N'
     elif (severity_name == 'High' and defect_fixed_new_duration > high_point):
