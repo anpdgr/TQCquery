@@ -1,5 +1,5 @@
 from flask import send_file, Flask, render_template, redirect, url_for, session,request
-import cx_Oracle,os
+import cx_Oracle
 import pandas as pd
 from business_duration import businessDuration
 import holidays as pyholidays
