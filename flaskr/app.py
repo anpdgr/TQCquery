@@ -12,11 +12,6 @@ app = Flask(__name__)
 app.secret_key = "super secret key"
 
 
-# dsn_string = """(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=172.19.195.170)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=TQCPRD)))"""
-# try:
-#     connect = cx_Oracle.connect(user="QAQCAPPO", password="QAQCAPPO#123", dsn=dsn_string, encoding="UTF-8")
-# except:
-#     print("connect failed")
 
 sql = """\
 SELECT * FROM (
@@ -93,9 +88,9 @@ LEFT OUTER JOIN defect_log defect_log_assigned ON (defect_log_assigned.defect_id
 LEFT OUTER JOIN defect_log defect_log_request ON (defect_log_request.defect_id = defect.defect_id) and (defect_log_request.sub_id = sub_defect.sub_run_id) AND (defect_log_request.new_value = 'Request to Deploy')
 LEFT OUTER JOIN defect_log defect_log_ready ON (defect_log_ready.defect_id = defect.defect_id) and (defect_log_ready.sub_id = sub_defect.sub_run_id) AND (defect_log_ready.new_value = 'Ready to Test')
 LEFT OUTER JOIN defect_log defect_log_closed ON (defect_log_closed.defect_id = defect.defect_id) and (defect_log_closed.sub_id = sub_defect.sub_run_id) AND (defect_log_closed.new_value = 'Closed')
-order by project.project_id, defect.defect_run_id , sub_defect.SUB_RUN_ID
+order by project.project_id DESC , defect.defect_run_id , sub_defect.SUB_RUN_ID
 )
-where  row_num=1 and rownum <= 30
+where  row_num=1 
 """
 
 #completed
@@ -113,9 +108,10 @@ where  row_num=1 and rownum <= 30
 def mainTable():
     connect = db.get_db()
     cur = connect.cursor()
-    cur.execute(sql)
+    mainSQL = sql + " and rownum <= 500"
+    cur.execute(mainSQL)
     rows = cur.fetchall()
-    DurSLA = TQC_report_v5.tqcCalculate(sql,connect)
+    DurSLA = TQC_report_v5.tqcCalculate(mainSQL,connect)
     defect_new_list = DurSLA[0]
     defect_fixed_new_list = DurSLA[1]
     defect_fixed_assigned_list = DurSLA[2]
