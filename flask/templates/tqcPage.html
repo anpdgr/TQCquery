@@ -136,19 +136,17 @@
             </div>
           </form>
           <br><br>
+          {% if pjName %}
           <a href="/" style="color: #d11141; float:right;"
-            >Clear filter
-          </a>
+          >Clear filter
+        </a>
           <a 
-            {% if pjName %}
-              href="/exportsome/{{pjName}}" 
-            {% else %}
-              href="/exportall"
-            {% endif %}
+            href="/exportsome/{{pjName}}" 
             style="color: #d11141; text-decoration: underline; float: right; margin-right: 50px;"
             ><i class="fa fa-file-excel-o" style="font-size: 24px;"> </i> Export <b>filtered
             data</b> (by Project name)
           </a>
+          {% endif %}
 
           <!-- <a href="/download" style="color: #d11141; text-decoration: underline; float: right; margin-right: 50px;"
             ><i class="fa fa-file-excel-o" style="font-size: 24px;"> </i> Export
@@ -193,19 +191,17 @@
               </div>
             </div>
           </form>
+          {% if sDate and eDate %}
           <a href="/" style="color: #d11141; float:right;  margin-top: 10px; "
             >Clear filter
           </a>
           <a 
-            {% if sDate and eDate %}
               href="/exportsome/{{sDate}}/{{eDate}}" 
-            {% else %}
-              href="/exportall"
-            {% endif %}
             style="color: #d11141; text-decoration: underline; float: right; margin-top: 10px;  margin-right: 50px;"
             ><i class="fa fa-file-excel-o" style="font-size: 24px;"> </i> Export <b>filtered
             data </b> (by Date)
           </a>
+          {% endif %}
         </div>
 
       </div>
