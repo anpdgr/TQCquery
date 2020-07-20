@@ -178,7 +178,7 @@ def exportsomePj(pjName):
         pjSQL = sql+ " and project_name ='"+pjName+"'"
         pjList = TQC_report_v5.tqcCalculate(pjSQL,connect)
         pjExport = pjList[6]
-        pjExport.to_csv(r"flask/"+filename,index=False,header=True,encoding='utf-8-sig')
+        pjExport.to_csv(filename,index=False,header=True,encoding='utf-8-sig')
         path = filename
         return send_file(path,as_attachment=True)
     return redirect(url_for('mainTable'))
@@ -193,7 +193,7 @@ def exportsomeDate(sDate,eDate):
         dateSQL = sql+" and ( (Start_Date BETWEEN "+sToDate+" AND "+eToDate+" ) OR (End_Date BETWEEN "+sToDate+" AND "+eToDate+" ) )"
         dateList = TQC_report_v5.tqcCalculate(dateSQL,connect)
         dateExport = dateList[6]
-        dateExport.to_csv(r"flask/"+filename,index=False,header=True,encoding='utf-8-sig')
+        dateExport.to_csv(filename,index=False,header=True,encoding='utf-8-sig')
         path = filename
         return send_file(path,as_attachment=True)
     return redirect(url_for('mainTable'))
