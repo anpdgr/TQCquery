@@ -90,7 +90,7 @@ LEFT OUTER JOIN defect_log defect_log_ready ON (defect_log_ready.defect_id = def
 LEFT OUTER JOIN defect_log defect_log_closed ON (defect_log_closed.defect_id = defect.defect_id) and (defect_log_closed.sub_id = sub_defect.sub_run_id) AND (defect_log_closed.new_value = 'Closed')
 order by project.project_id DESC , defect.defect_run_id , sub_defect.SUB_RUN_ID
 )
-where  row_num=1 
+where  row_num=1 and rownum<=30
 """
 
 #completed
@@ -118,16 +118,18 @@ def mainTable():
     defect_test_list = DurSLA[3]
     defect_age_list = DurSLA[4]
     meet_sla_list = DurSLA[5]
-    dfExport = DurSLA[6]
-    return render_template('tqcPage.html', datas=rows, new_durations=defect_new_list,fixed_new=defect_fixed_new_list,fixed_assigned=defect_fixed_assigned_list,test=defect_test_list,age=defect_age_list,meetsla=meet_sla_list)
+    #dfExport = DurSLA[6]
+    cur.execute("select distinct project_name from project")
+    pjNameList = cur.fetchall()
+    return render_template('tqcPage.html', pjNameList=pjNameList, datas=rows, new_durations=defect_new_list,fixed_new=defect_fixed_new_list,fixed_assigned=defect_fixed_assigned_list,test=defect_test_list,age=defect_age_list,meetsla=meet_sla_list)
 
 
-@app.route("/exportall")
+"""@app.route("/exportall")
 def export():
     filename = "TQC_query_results_"+str(datetime.now().strftime("%Y-%m-%d %H%M%S"))+".csv"
     dfExport.to_csv(r"flask/"+filename,index=False,header=True,encoding='utf-8-sig')
     path = filename
-    return send_file(path,as_attachment=True)
+    return send_file(path,as_attachment=True)"""
 
 #completed
 @app.route("/filter",methods=["POST","GET"])

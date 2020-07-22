@@ -19,6 +19,7 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
     />
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
@@ -103,22 +104,23 @@
             class="container tab-pane fade" 
           {% endif %}
         >
-          <br />
           <form action="/filter" method="post">
+            <br>
             <div class="row" style="float: right; min-width: 500px;">
               <input
               class="form-control col"
               type="hidden"
               id="start"
               name="start"
-            />
-            <input
-              class="form-control col"
-              type="hidden"
-              id="end"
-              name="end"
-              value=""
-            />
+              />
+              <input
+                class="form-control col"
+                type="hidden"
+                id="end"
+                name="end"
+                value=""
+              />
+
               <label>Project Name : &nbsp;</label>
               <input
                 class="form-control col"
@@ -127,7 +129,29 @@
                 name="pjName"
                 value="{{pjName}}"
                 required
+                onclick="document.getElementById('id01').style.display='block'" class="w3-button w3-black"
               />
+              <div id="id01" class="w3-modal">
+                <div class="w3-modal-content">
+                  <div class="w3-container">
+                    <span onclick="document.getElementById('id01').style.display='none'" class="w3-button w3-display-topright">&times;</span>
+                    <h2>List of Project name</h2>
+            
+                    <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for Project names">
+            
+                    <table id="myTable">
+                      {% for eachPj in pjNameList %}
+                      {% set index = loop.index0 %}
+                      <tr  class="trClass"> 
+                        <td onclick='selectedPj(this.id)' class='idClass' id='{{index}}'>{{eachPj.0}}</td>
+                      </tr>
+                      {% endfor %}
+                    </table>
+                    
+                  </div>
+                </div>
+              </div>
+
               <div class="col" style="padding-right:0px;" >
                 <button class="btn btn-outline-danger" type="submit" style="float:right; margin-right: 10px;">
                   search
@@ -185,7 +209,7 @@
                 value=""
               />
               <div class="col" style="padding-right:0px;">
-                <button class="btn btn-outline-danger" type="submit">
+                <button class="btn btn-outline-danger" type="submit" style="float:right; margin-right: 10px;">
                   search
                 </button>
               </div>
@@ -208,7 +232,7 @@
     </div>
     <!-- table -->
     <div style="margin: 10px 20px 10px 20px;">
-      <table class="table table-fluid hover cell-border" id="myTable">
+      <table class="table table-fluid hover cell-border" id="myTableMain">
         <thead style="background-color: #d11141; color: #fffafa;">
           <tr>
             <th>Project name</th>
@@ -313,11 +337,36 @@
   </body>
   <script>
     $(document).ready(function () {
-      $("#myTable").DataTable({
+      $("#myTableMain").DataTable({
         ordering: false,
         searching: false,
       });
     });
+
+    function myFunction() {
+      var input, filter, table, tr, td, i, txtValue;
+      input = document.getElementById("myInput");
+      filter = input.value.toUpperCase();
+      table = document.getElementById("myTable");
+      tr = table.getElementsByTagName("tr");
+      for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[0];
+        if (td) {
+          txtValue = td.textContent || td.innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            tr[i].style.display = "";
+          } else {
+            tr[i].style.display = "none";
+          }
+        }       
+      }
+    }
+
+    function selectedPj(idPj){
+      var tds = document.querySelectorAll('tr.trClass td');
+      document.getElementById('id01').style.display='none'
+      document.getElementById('pjName').value = tds[idPj].textContent;
+    }
   </script>
 </html>
 
@@ -328,5 +377,42 @@
 
   .oneline {
     display: inline-block;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  #myInput {
+    width: 100%;
+    font-size: 16px;
+    padding: 12px 20px 12px 40px;
+    border: 1px solid #ddd;
+    margin-bottom: 12px;
+  }
+
+  #myTable {
+    border-collapse: collapse;
+    width: 100%;
+    border: 1px solid #ddd;
+    font-size: 16px;
+    height: 550px;
+    overflow-y: scroll;
+    display: block;
+    margin-bottom: 15px;
+  }
+
+  #myTable th, #myTable td {
+    text-align: left;
+    padding: 12px;
+  }
+
+  #myTable tr {
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+  }
+
+  #myTable tr.header, #myTable tr:hover {
+    background-color: #f1f1f1;
   }
 </style>
