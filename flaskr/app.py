@@ -171,8 +171,10 @@ def filteredTable():
             cur.execute(dateSQL)
             checkTab = 'date'
     rows = cur.fetchall()
+    cur.execute("select distinct project_name from project")
+    pjNameList = cur.fetchall()
     connect.commit()
-    return render_template('tqcPage.html', datas=rows, new_durations=defect_new_list,fixed_new=defect_fixed_new_list,fixed_assigned=defect_fixed_assigned_list,test=defect_test_list,age=defect_age_list,meetsla=meet_sla_list,pjName=pjName,sDate=sDate,eDate=eDate,checkTab=checkTab)
+    return render_template('tqcPage.html', pjNameList=pjNameList, datas=rows, new_durations=defect_new_list,fixed_new=defect_fixed_new_list,fixed_assigned=defect_fixed_assigned_list,test=defect_test_list,age=defect_age_list,meetsla=meet_sla_list,pjName=pjName,sDate=sDate,eDate=eDate,checkTab=checkTab)
 
 """@app.route('/download')
 def downloadFile():
